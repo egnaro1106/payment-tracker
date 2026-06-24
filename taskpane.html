@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Tracker v2</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0f1117;--surface:#1a1d27;--surface2:#222638;--border:#2e3350;
+      --accent:#4f8ef7;--green:#34c77b;--red:#f05252;--yellow:#f59e0b;--purple:#a78bfa;
+      --text:#e8eaf6;--muted:#8b90a8;--font:'Segoe UI',system-ui,sans-serif;
+      --gremax:#4f8ef7;--cic:#34c77b;--ciceu:#a78bfa;--cicuk:#f59e0b;
+    }
+    body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
+
+    /* Header */
+    .header{background:linear-gradient(135deg,#1a1d27,#222638);border-bottom:1px solid var(--border);padding:11px 14px;display:flex;align-items:center;gap:10px}
+    .header-title{font-size:14px;font-weight:700}
+    .header-sub{font-size:10.5px;color:var(--muted);margin-top:1px}
+
+    /* Tabs */
+    .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface)}
+    .tab{flex:1;padding:8px 2px;text-align:center;font-size:11px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+    .tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+
+    /* Company filter bar */
+    .company-bar{display:flex;gap:5px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:wrap}
+    .co-btn{padding:4px 10px;border-radius:12px;border:1.5px solid var(--border);background:transparent;font-size:10.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s;color:var(--muted)}
+    .co-btn.active-gremax{border-color:var(--gremax);color:var(--gremax);background:rgba(79,142,247,.12)}
+    .co-btn.active-cic{border-color:var(--cic);color:var(--cic);background:rgba(52,199,123,.12)}
+    .co-btn.active-ciceu{border-color:var(--ciceu);color:var(--ciceu);background:rgba(167,139,250,.12)}
+    .co-btn.active-cicuk{border-color:var(--cicuk);color:var(--cicuk);background:rgba(245,158,11,.12)}
+    .co-btn.active-all{border-color:var(--accent);color:var(--accent);background:rgba(79,142,247,.12)}
+
+    /* Panel */
+    .panel{display:none;padding:13px 14px}
+    .panel.active{display:block}
+
+    /* Entity badge */
+    .entity-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;margin-bottom:12px}
+    .entity-gremax{background:rgba(79,142,247,.15);color:var(--gremax);border:1px solid rgba(79,142,247,.3)}
+    .entity-cic{background:rgba(52,199,123,.15);color:var(--cic);border:1px solid rgba(52,199,123,.3)}
+    .entity-ciceu{background:rgba(167,139,250,.15);color:var(--ciceu);border:1px solid rgba(167,139,250,.3)}
+    .entity-cicuk{background:rgba(245,158,11,.15);color:var(--cicuk);border:1px solid rgba(245,158,11,.3)}
+
+    /* Extract bar */
+    .extract-bar{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:13px}
+    .extract-bar p{color:var(--muted);font-size:11.5px;line-height:1.5;margin-bottom:9px}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s}
+    .btn-primary{background:var(--accent);color:#fff;width:100%;justify-content:center}
+    .btn-primary:hover{background:#3a7ae0}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+    .btn-success{background:var(--green);color:#0f1117;width:100%;justify-content:center}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:5px 9px}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* Fields */
+    .field-group{margin-bottom:11px}
+    .field-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+    .field-value{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12.5px;color:var(--text);width:100%;font-family:var(--font)}
+    .field-value:focus{outline:none;border-color:var(--accent)}
+    select.field-value{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b90a8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+
+    /* Approval flow */
+    .flow-steps{display:flex;align-items:center;gap:0;margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .flow-step{flex:1;padding:8px 4px;text-align:center;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;border-right:1px solid var(--border);position:relative}
+    .flow-step:last-child{border-right:none}
+    .flow-step.done{color:var(--green);background:rgba(52,199,123,.08)}
+    .flow-step.current{color:var(--accent);background:rgba(79,142,247,.1);font-weight:700}
+    .flow-step .step-icon{font-size:14px;display:block;margin-bottom:2px}
+
+    /* Status row */
+    .status-row{display:flex;gap:5px}
+    .status-btn{flex:1;padding:6px 0;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:10.5px;font-weight:600;cursor:pointer;text-align:center;transition:all .18s}
+    .status-btn[data-val="pending"].active{border-color:var(--yellow);color:var(--yellow);background:rgba(245,158,11,.1)}
+    .status-btn[data-val="approved"].active{border-color:var(--green);color:var(--green);background:rgba(52,199,123,.1)}
+    .status-btn[data-val="paid"].active{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1)}
+    .status-btn[data-val="rejected"].active{border-color:var(--red);color:var(--red);background:rgba(240,82,82,.1)}
+
+    /* AP Table */
+    .ap-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+    .ap-count{font-size:11px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;font-size:11px}
+    th{text-align:left;padding:6px 7px;color:var(--muted);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+    td{padding:7px 7px;border-bottom:1px solid rgba(46,51,80,.4);vertical-align:middle}
+    tr:hover td{background:rgba(79,142,247,.03)}
+    .badge{display:inline-block;padding:2px 6px;border-radius:8px;font-size:9.5px;font-weight:700}
+    .badge-pending{background:rgba(245,158,11,.15);color:var(--yellow)}
+    .badge-approved{background:rgba(52,199,123,.15);color:var(--green)}
+    .badge-paid{background:rgba(167,139,250,.15);color:var(--purple)}
+    .badge-rejected{background:rgba(240,82,82,.12);color:var(--red)}
+
+    /* Company dot */
+    .co-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px;flex-shrink:0}
+    .dot-gremax{background:var(--gremax)}
+    .dot-cic{background:var(--cic)}
+    .dot-ciceu{background:var(--ciceu)}
+    .dot-cicuk{background:var(--cicuk)}
+
+    /* Summary cards */
+    .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+    .summary-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+    .summary-card .sc-label{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .summary-card .sc-val{font-size:16px;font-weight:800;color:var(--accent)}
+    .summary-card .sc-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+    /* Cash flow */
+    .cf-entity-section{margin-bottom:18px}
+    .cf-entity-header{display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    .cf-entity-name{font-size:12px;font-weight:700}
+    .cf-entity-total{margin-left:auto;font-size:12px;font-weight:700;color:var(--accent)}
+    .cf-month-block{margin-bottom:10px}
+    .cf-month-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+    .cf-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(46,51,80,.3)}
+    .cf-vendor{font-size:11.5px;font-weight:600}
+    .cf-meta{font-size:10px;color:var(--muted)}
+    .cf-amount{font-weight:700;font-size:12px;color:var(--accent);white-space:nowrap}
+    .cf-month-total{display:flex;justify-content:space-between;padding:6px 0 0;font-size:11px}
+    .cf-month-total-label{color:var(--muted)}
+    .cf-month-total-val{font-weight:700}
+
+    .overdue{color:var(--red)!important}
+    .due-soon{color:var(--yellow)!important}
+
+    .toast{padding:8px 11px;border-radius:7px;font-size:12px;margin-top:10px;display:none}
+    .toast.success{background:rgba(52,199,123,.15);border:1px solid var(--green);color:var(--green)}
+    .toast.error{background:rgba(240,82,82,.12);border:1px solid var(--red);color:var(--red)}
+    .divider{height:1px;background:var(--border);margin:11px 0}
+    .empty-state{text-align:center;padding:28px 16px;color:var(--muted)}
+    .empty-state .emoji{font-size:28px;margin-bottom:7px}
+    .empty-state p{font-size:11.5px;line-height:1.5}
+    .export-row{display:flex;gap:7px;margin-top:11px}
+    .export-row .btn{flex:1;font-size:10.5px}
+    .amount-row{display:flex;gap:6px}
+    .amount-row select{width:80px;flex-shrink:0}
+    .amount-row input{flex:1}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div style="font-size:20px">💳</div>
+  <div>
+    <div class="header-title">Payment Tracker</div>
+    <div class="header-sub">Gremax SG · CIC · CIC EU · CIC UK</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('capture')">📧 提取</div>
+  <div class="tab" onclick="switchTab('aplist')">📋 AP List</div>
+  <div class="tab" onclick="switchTab('cashflow')">📊 Cash Flow</div>
+</div>
+
+<!-- Company filter bar (shown on AP + Cash Flow) -->
+<div class="company-bar" id="companyBar" style="display:none">
+  <button class="co-btn active-all" data-co="all" onclick="setCoFilter('all',this)">🌐 全部</button>
+  <button class="co-btn" data-co="gremax" onclick="setCoFilter('gremax',this)">🔵 Gremax SG</button>
+  <button class="co-btn" data-co="cic" onclick="setCoFilter('cic',this)">🟢 CIC</button>
+  <button class="co-btn" data-co="ciceu" onclick="setCoFilter('ciceu',this)">🟣 CIC EU</button>
+  <button class="co-btn" data-co="cicuk" onclick="setCoFilter('cicuk',this)">🟡 CIC UK</button>
+</div>
+
+<!-- ══ TAB 1: CAPTURE ══ -->
+<div class="panel active" id="tab-capture">
+  <div class="extract-bar">
+    <p>点击按钮读取当前邮件，自动识别公司主体、金额、截止日期。</p>
+    <button class="btn btn-primary" id="extractBtn" onclick="extractFromEmail()">🔍 从邮件提取信息</button>
+  </div>
+
+  <div id="extractedForm" style="display:none">
+
+    <!-- Detected entity -->
+    <div id="entityBadgeWrap"></div>
+
+    <div class="field-group">
+      <div class="field-label">付款公司主体</div>
+      <select class="field-value" id="f-entity">
+        <option value="gremax">Gremax SG</option>
+        <option value="cic">CIC</option>
+        <option value="ciceu">CIC EU</option>
+        <option value="cicuk">CIC UK</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">供应商 / Vendor</div>
+      <input class="field-value" id="f-vendor" type="text" placeholder="供应商名称"/>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">客户 / On behalf of</div>
+      <input class="field-value" id="f-client" type="text" placeholder="如：Tredit（留空表示公司自身）"/>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">金额 / Amount</div>
+      <div class="amount-row">
+        <select class="field-value" id="f-currency">
+          <option>USD</option><option>SGD</option><option>CNY</option>
+          <option>MYR</option><option>EUR</option><option>GBP</option>
+        </select>
+        <input class="field-value" id="f-amount" type="number" placeholder="0.00"/>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">付款截止日期 / Due Date</div>
+      <input class="field-value" id="f-duedate" type="date"/>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">费用描述 / Description</div>
+      <input class="field-value" id="f-desc" type="text" placeholder="如：泰国发港杂费"/>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Invoice / 参考编号</div>
+      <input class="field-value" id="f-invoice" type="text" placeholder="INV-XXXX"/>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">审批流程</div>
+      <div class="flow-steps">
+        <div class="flow-step current" id="flow-pending">
+          <span class="step-icon">📥</span>待审批
+        </div>
+        <div class="flow-step" id="flow-approved">
+          <span class="step-icon">✅</span>Zhangyu批准
+        </div>
+        <div class="flow-step" id="flow-paid">
+          <span class="step-icon">💸</span>Sandra付款
+        </div>
+      </div>
+      <div class="status-row">
+        <button class="status-btn active" data-val="pending" onclick="setStatus(this)">⏳ 待审批</button>
+        <button class="status-btn" data-val="approved" onclick="setStatus(this)">✅ 已批准</button>
+        <button class="status-btn" data-val="paid" onclick="setStatus(this)">💸 已付款</button>
+        <button class="status-btn" data-val="rejected" onclick="setStatus(this)">❌ 拒绝</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Payment Advice / 备注</div>
+      <input class="field-value" id="f-notes" type="text" placeholder="付款后填入 Payment Advice 编号"/>
+    </div>
+
+    <div class="divider"></div>
+    <button class="btn btn-success" onclick="saveRecord()">💾 保存记录</button>
+    <div class="toast" id="saveToast"></div>
+  </div>
+</div>
+
+<!-- ══ TAB 2: AP LIST ══ -->
+<div class="panel" id="tab-aplist">
+  <div class="summary-grid" id="apSummary"></div>
+  <div class="ap-header">
+    <div class="ap-count" id="apCount">共 0 条</div>
+    <div style="display:flex;gap:5px">
+      <button class="btn btn-ghost" onclick="setApStatus('all')">全部</button>
+      <button class="btn btn-ghost" onclick="setApStatus('pending')">待批</button>
+      <button class="btn btn-ghost" onclick="setApStatus('approved')">已批</button>
+      <button class="btn btn-ghost" onclick="setApStatus('paid')">已付</button>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>主体</th><th>供应商</th><th>金额</th><th>到期</th><th>状态</th><th></th>
+      </tr></thead>
+      <tbody id="apTableBody"></tbody>
+    </table>
+  </div>
+  <div id="apEmpty" class="empty-state" style="display:none">
+    <div class="emoji">📭</div>
+    <p>还没有记录<br/>在「提取」页面从邮件添加</p>
+  </div>
+  <div class="export-row">
+    <button class="btn btn-ghost" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn btn-ghost" onclick="exportJSON()">⬇ JSON</button>
+  </div>
+</div>
+
+<!-- ══ TAB 3: CASH FLOW ══ -->
+<div class="panel" id="tab-cashflow">
+  <div id="cashflowContent"></div>
+  <div id="cfEmpty" class="empty-state" style="display:none">
+    <div class="emoji">📊</div>
+    <p>还没有付款数据<br/>记录付款后即可查看现金流预测</p>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let records = JSON.parse(localStorage.getItem('pt_v2_records') || '[]');
+let currentStatus = 'pending';
+let coFilter = 'all';
+let apStatusFilter = 'all';
+
+// ── Company config ──
+const COMPANIES = {
+  gremax: { label:'Gremax SG', color:'var(--gremax)', dot:'dot-gremax', cls:'entity-gremax', keywords:['gremax','tredit'] },
+  cic:    { label:'CIC',       color:'var(--cic)',    dot:'dot-cic',    cls:'entity-cic',    keywords:['cic international','cic int'] },
+  ciceu:  { label:'CIC EU',    color:'var(--ciceu)',  dot:'dot-ciceu',  cls:'entity-ciceu',  keywords:['cic eu','ciceu'] },
+  cicuk:  { label:'CIC UK',    color:'var(--cicuk)',  dot:'dot-cicuk',  cls:'entity-cicuk',  keywords:['cic uk','cicuk'] },
+};
+
+// ── Detect entity from subject ──
+function detectEntity(subject) {
+  const s = subject.toLowerCase();
+  // Order matters: check specific ones first
+  if (s.includes('cic eu') || s.includes('ciceu')) return 'ciceu';
+  if (s.includes('cic uk') || s.includes('cicuk')) return 'cicuk';
+  if (s.includes('cic')) return 'cic';
+  if (s.includes('gremax') || s.includes('tredit')) return 'gremax';
+  return null;
+}
+
+// ── Parse subject: "BDP-Tredit泰国发港杂费付款-$857.48 -7.10日前" ──
+function parseSubject(subject) {
+  const parts = subject.split('-');
+  const vendor = parts[0] ? parts[0].trim() : '';
+
+  // Amount: look for $ or currency + number
+  const amtMatch = subject.match(/(?:USD|SGD|CNY|MYR|EUR|GBP|RM|S\$|\$|¥|€|£)\s*([\d,]+(?:\.\d{1,2})?)/i)
+                || subject.match(/([\d,]+(?:\.\d{1,2})?)\s*(?:USD|SGD|CNY|MYR|EUR|GBP)/i);
+  const amount = amtMatch ? amtMatch[1].replace(/,/g,'') : '';
+
+  // Currency
+  let currency = 'USD';
+  const curMatch = subject.match(/\b(USD|SGD|CNY|MYR|EUR|GBP)\b/i);
+  if (curMatch) currency = curMatch[1].toUpperCase();
+  else if (/S\$/.test(subject)) currency = 'SGD';
+  else if (/\$/.test(subject)) currency = 'USD';
+  else if (/RM/.test(subject)) currency = 'MYR';
+
+  // Due date: "7.10日前" or "7/10" or explicit date
+  let dueDate = '';
+  const dotDate = subject.match(/(\d{1,2})\.(\d{1,2})日前/);
+  if (dotDate) {
+    const year = new Date().getFullYear();
+    const m = dotDate[1].padStart(2,'0');
+    const d = dotDate[2].padStart(2,'0');
+    dueDate = `${year}-${m}-${d}`;
+  } else {
+    const isoMatch = subject.match(/(\d{4}[-\/]\d{1,2}[-\/]\d{1,2})/);
+    if (isoMatch) dueDate = isoMatch[1].replace(/\//g,'-');
+  }
+
+  // Client (2nd segment if known non-company)
+  const clientMatch = subject.match(/^[^-]+-([A-Za-z\u4e00-\u9fa5]+)/);
+  const client = clientMatch ? clientMatch[1].trim() : '';
+
+  // Description: middle part
+  const descMatch = subject.match(/^[^-]+-[^-]+-?(.+?)-\$?[\d,.]+/);
+  const desc = descMatch ? descMatch[1].trim() : '';
+
+  return { vendor, amount, currency, dueDate, client, desc };
+}
+
+// ── Office init ──
+Office.onReady(function(info) {
+  renderAP(); renderCashFlow();
+});
+
+// ── Tab switching ──
+function switchTab(name) {
+  ['capture','aplist','cashflow'].forEach((t,i) => {
+    document.querySelectorAll('.tab')[i].classList.toggle('active', t === name);
+    document.getElementById('tab-'+t).classList.toggle('active', t === name);
+  });
+  const showBar = name !== 'capture';
+  document.getElementById('companyBar').style.display = showBar ? 'flex' : 'none';
+  if (name === 'aplist') renderAP();
+  if (name === 'cashflow') renderCashFlow();
+}
+
+// ── Company filter ──
+function setCoFilter(co, btn) {
+  coFilter = co;
+  document.querySelectorAll('.co-btn').forEach(b => {
+    b.className = 'co-btn';
+    if (b.dataset.co === co) b.classList.add('active-' + (co === 'all' ? 'all' : co));
+  });
+  renderAP(); renderCashFlow();
+}
+
+// ── Extract ──
+function extractFromEmail() {
+  const btn = document.getElementById('extractBtn');
+  btn.disabled = true; btn.textContent = '⏳ 读取中…';
+
+  const item = Office.context.mailbox.item;
+  const subject = item.subject || '';
+  const sender = item.from ? (item.from.displayName || item.from.emailAddress || '') : '';
+
+  // Parse subject
+  const parsed = parseSubject(subject);
+  const entity = detectEntity(subject);
+
+  // Populate form
+  if (entity) document.getElementById('f-entity').value = entity;
+  document.getElementById('f-vendor').value = parsed.vendor || sender;
+  document.getElementById('f-client').value = parsed.client || '';
+  document.getElementById('f-amount').value = parsed.amount;
+  document.getElementById('f-currency').value = parsed.currency;
+  document.getElementById('f-duedate').value = parsed.dueDate;
+  document.getElementById('f-desc').value = parsed.desc;
+
+  // Also scan body for invoice
+  item.body.getAsync(Office.CoercionType.Text, function(res) {
+    if (res.status === Office.AsyncResultStatus.Succeeded) {
+      const body = res.value || '';
+      const invMatch = body.match(/(?:invoice|inv|invoice no\.?|inv\.?\s*#?)[^\w]*([\w\-]+)/i);
+      if (invMatch) document.getElementById('f-invoice').value = invMatch[1];
+      // Fallback amount from body if subject didn't have it
+      if (!parsed.amount) {
+        const bAmt = body.match(/(?:SGD|USD|\$)\s*([\d,]+(?:\.\d{2})?)/i);
+        if (bAmt) document.getElementById('f-amount').value = bAmt[1].replace(/,/g,'');
+      }
+    }
+    renderEntityBadge(entity);
+    document.getElementById('extractedForm').style.display = 'block';
+    btn.disabled = false; btn.textContent = '🔄 重新提取';
+  });
+}
+
+function renderEntityBadge(entity) {
+  const wrap = document.getElementById('entityBadgeWrap');
+  if (!entity) { wrap.innerHTML = ''; return; }
+  const co = COMPANIES[entity];
+  wrap.innerHTML = `<div class="entity-badge ${co.cls}">
+    <span class="co-dot ${co.dot}"></span> ${co.label} — 自动识别
+  </div>`;
+}
+
+// ── Status ──
+function setStatus(btn) {
+  document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentStatus = btn.dataset.val;
+  updateFlowSteps(currentStatus);
+}
+
+function updateFlowSteps(status) {
+  const steps = ['pending','approved','paid'];
+  const idx = steps.indexOf(status);
+  steps.forEach((s, i) => {
+    const el = document.getElementById('flow-'+s);
+    if (!el) return;
+    el.className = 'flow-step';
+    if (i < idx) el.classList.add('done');
+    else if (i === idx) el.classList.add('current');
+  });
+}
+
+// ── Save ──
+function saveRecord() {
+  const vendor = document.getElementById('f-vendor').value.trim();
+  const amount = parseFloat(document.getElementById('f-amount').value);
+  const dueDate = document.getElementById('f-duedate').value;
+  if (!vendor || !amount || !dueDate) {
+    showToast('请填写供应商、金额和截止日期','error'); return;
+  }
+  const record = {
+    id: Date.now(),
+    entity: document.getElementById('f-entity').value,
+    vendor, amount,
+    currency: document.getElementById('f-currency').value,
+    dueDate,
+    client: document.getElementById('f-client').value.trim(),
+    desc: document.getElementById('f-desc').value.trim(),
+    invoice: document.getElementById('f-invoice').value.trim(),
+    status: currentStatus,
+    notes: document.getElementById('f-notes').value.trim(),
+    emailSubject: Office.context.mailbox.item ? Office.context.mailbox.item.subject : '',
+    capturedAt: new Date().toISOString(),
+  };
+  records.unshift(record);
+  localStorage.setItem('pt_v2_records', JSON.stringify(records));
+  showToast('✅ 已保存！', 'success');
+  setTimeout(() => {
+    document.getElementById('extractedForm').style.display = 'none';
+    document.getElementById('extractBtn').textContent = '🔍 从邮件提取信息';
+    document.getElementById('entityBadgeWrap').innerHTML = '';
+    currentStatus = 'pending';
+    document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.dataset.val==='pending'));
+    updateFlowSteps('pending');
+  }, 1500);
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('saveToast');
+  t.textContent = msg; t.className = 'toast '+type; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+// ── AP List ──
+function setApStatus(s) { apStatusFilter = s; renderAP(); }
+
+function filteredRecords() {
+  return records
+    .filter(r => coFilter === 'all' || r.entity === coFilter)
+    .filter(r => apStatusFilter === 'all' || r.status === apStatusFilter);
+}
+
+function renderAP() {
+  const list = filteredRecords();
+  const tbody = document.getElementById('apTableBody');
+  const empty = document.getElementById('apEmpty');
+  document.getElementById('apCount').textContent = '共 ' + list.length + ' 条';
+
+  // Summary cards
+  const allFiltered = records.filter(r => coFilter === 'all' || r.entity === coFilter);
+  const pending = allFiltered.filter(r => r.status === 'pending').reduce((s,r) => s+r.amount, 0);
+  const approved = allFiltered.filter(r => r.status === 'approved').reduce((s,r) => s+r.amount, 0);
+  document.getElementById('apSummary').innerHTML = `
+    <div class="summary-card">
+      <div class="sc-label">待审批</div>
+      <div class="sc-val" style="color:var(--yellow)">${allFiltered.filter(r=>r.status==='pending').length} 笔</div>
+      <div class="sc-sub">${fmtAmt(pending)}</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">已批准待付</div>
+      <div class="sc-val" style="color:var(--green)">${allFiltered.filter(r=>r.status==='approved').length} 笔</div>
+      <div class="sc-sub">${fmtAmt(approved)}</div>
+    </div>`;
+
+  if (list.length === 0) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const bLabels = {pending:'⏳ 待批',approved:'✅ 批准',paid:'💸 已付',rejected:'❌ 拒绝'};
+  const bCls = {pending:'badge-pending',approved:'badge-approved',paid:'badge-paid',rejected:'badge-rejected'};
+
+  tbody.innerHTML = list.map(r => {
+    const co = COMPANIES[r.entity] || COMPANIES.gremax;
+    const due = new Date(r.dueDate);
+    const diff = Math.ceil((due-today)/86400000);
+    const dueCls = diff<0?'overdue':diff<=7?'due-soon':'';
+    return `<tr>
+      <td><span class="co-dot ${co.dot}"></span><span style="font-size:10px">${co.label}</span></td>
+      <td>
+        <div style="font-weight:600;font-size:11.5px">${esc(r.vendor)}</div>
+        <div style="color:var(--muted);font-size:10px">${esc(r.client||r.desc||'')}</div>
+      </td>
+      <td style="font-weight:700;color:var(--accent);white-space:nowrap;font-size:11.5px">
+        ${r.currency} ${Number(r.amount).toLocaleString('en',{minimumFractionDigits:2})}
+      </td>
+      <td class="${dueCls}" style="white-space:nowrap;font-size:10.5px">
+        ${r.dueDate}<br><span style="font-size:10px">${diff<0?'逾期'+Math.abs(diff)+'d':diff===0?'今天':diff+'d后'}</span>
+      </td>
+      <td><span class="badge ${bCls[r.status]}">${bLabels[r.status]}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost" style="padding:2px 7px;font-size:10px" onclick="cycleStatus(${r.id})">改状态</button>
+        <button class="btn btn-ghost" style="padding:2px 7px;font-size:10px;color:var(--red)" onclick="del(${r.id})">删</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function cycleStatus(id) {
+  const cycle = ['pending','approved','paid','rejected'];
+  const r = records.find(x=>x.id===id);
+  if (!r) return;
+  r.status = cycle[(cycle.indexOf(r.status)+1)%cycle.length];
+  localStorage.setItem('pt_v2_records', JSON.stringify(records));
+  renderAP();
+}
+
+function del(id) {
+  if (!confirm('确定删除？')) return;
+  records = records.filter(r=>r.id!==id);
+  localStorage.setItem('pt_v2_records', JSON.stringify(records));
+  renderAP(); renderCashFlow();
+}
+
+// ── Cash Flow ──
+function renderCashFlow() {
+  const content = document.getElementById('cashflowContent');
+  const empty = document.getElementById('cfEmpty');
+  const active = records.filter(r =>
+    r.status !== 'rejected' &&
+    (coFilter === 'all' || r.entity === coFilter)
+  );
+  if (active.length === 0) { content.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const grandTotal = active.reduce((s,r)=>s+r.amount,0);
+
+  // Group by entity then by month
+  const entities = coFilter === 'all' ? ['gremax','cic','ciceu','cicuk'] : [coFilter];
+  let html = `<div class="summary-card" style="margin-bottom:13px;grid-column:span 2">
+    <div class="sc-label">总应付（未拒绝）</div>
+    <div class="sc-val">${fmtAmt(grandTotal)}</div>
+    <div class="sc-sub">${active.length} 笔 · ${[...new Set(active.map(r=>r.dueDate.slice(0,7)))].length} 个月</div>
+  </div>`;
+
+  entities.forEach(ent => {
+    const entRecords = active.filter(r=>r.entity===ent);
+    if (entRecords.length === 0) return;
+    const co = COMPANIES[ent];
+    const entTotal = entRecords.reduce((s,r)=>s+r.amount,0);
+
+    // By month
+    const byMonth = {};
+    entRecords.forEach(r => {
+      const key = r.dueDate.slice(0,7);
+      if (!byMonth[key]) byMonth[key]=[];
+      byMonth[key].push(r);
+    });
+
+    html += `<div class="cf-entity-section">
+      <div class="cf-entity-header">
+        <span class="co-dot ${co.dot}"></span>
+        <span class="cf-entity-name">${co.label}</span>
+        <span class="cf-entity-total">${fmtAmt(entTotal)}</span>
+      </div>`;
+
+    Object.keys(byMonth).sort().forEach(month => {
+      const items = byMonth[month].sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+      const mTotal = items.reduce((s,r)=>s+r.amount,0);
+      const d = new Date(month+'-01');
+      const mLabel = d.toLocaleDateString('zh-CN',{year:'numeric',month:'long'});
+
+      html += `<div class="cf-month-block">
+        <div class="cf-month-label">${mLabel}</div>`;
+
+      items.forEach(r => {
+        const due = new Date(r.dueDate);
+        const diff = Math.ceil((due-today)/86400000);
+        const dueCls = diff<0?'overdue':diff<=7?'due-soon':'';
+        const statusIcon = {pending:'⏳',approved:'✅',paid:'💸'}[r.status]||'';
+        html += `<div class="cf-row">
+          <div>
+            <div class="cf-vendor">${esc(r.vendor)}${r.client?' · '+esc(r.client):''}</div>
+            <div class="cf-meta ${dueCls}">${r.dueDate} ${statusIcon} ${r.desc?'· '+esc(r.desc):''}</div>
+          </div>
+          <div class="cf-amount">${r.currency} ${Number(r.amount).toLocaleString('en',{minimumFractionDigits:2})}</div>
+        </div>`;
+      });
+
+      html += `<div class="cf-month-total">
+          <span class="cf-month-total-label">月度小计</span>
+          <span class="cf-month-total-val">${fmtAmt(mTotal)}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  content.innerHTML = html;
+}
+
+// ── Helpers ──
+function fmtAmt(n) { return n.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function exportCSV() {
+  const h = ['Entity','Vendor','Client','Amount','Currency','Due Date','Description','Invoice','Status','Notes','Captured At'];
+  const rows = records.map(r=>[
+    COMPANIES[r.entity]?.label||r.entity, r.vendor, r.client, r.amount, r.currency,
+    r.dueDate, r.desc, r.invoice, r.status, r.notes, r.capturedAt
+  ].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`));
+  const csv = [h.join(','), ...rows.map(r=>r.join(','))].join('\n');
+  dl('ap_list.csv', csv, 'text/csv');
+}
+function exportJSON() { dl('ap_records.json', JSON.stringify(records,null,2), 'application/json'); }
+function dl(name, content, mime) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download = name; a.click();
+}
+
+function setApStatus(s) { apStatusFilter=s; renderAP(); }
+</script>
+</body>
+</html>
