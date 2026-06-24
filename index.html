@@ -8,23 +8,23 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0f1117;--surface:#1a1d27;--surface2:#222638;--border:#2e3350;
-      --accent:#4f8ef7;--green:#34c77b;--red:#f05252;--yellow:#f59e0b;--purple:#a78bfa;
-      --text:#e8eaf6;--muted:#8b90a8;--font:'Segoe UI',system-ui,sans-serif;
-      --gremax:#4f8ef7;--cic:#34c77b;--ciceu:#a78bfa;--cicuk:#f59e0b;
+      --bg:#f5f6fa;--surface:#ffffff;--surface2:#f0f2f8;--border:#e2e6f0;
+      --accent:#2563eb;--green:#16a34a;--red:#dc2626;--yellow:#d97706;--purple:#7c3aed;
+      --text:#1e293b;--muted:#64748b;--font:'Segoe UI',system-ui,sans-serif;
+      --gremax:#2563eb;--cic:#16a34a;--ciceu:#7c3aed;--cicuk:#d97706;
     }
     body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
     .app{display:flex;flex-direction:column;height:100vh}
 
     /* Header */
-    .header{background:linear-gradient(135deg,#1a1d27,#222638);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0}
-    .header-title{font-size:17px;font-weight:700;letter-spacing:-.2px}
-    .header-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .header{background:linear-gradient(135deg,#1e40af,#2563eb);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+    .header-title{font-size:17px;font-weight:700;letter-spacing:-.2px;color:#fff}
+    .header-sub{font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px}
     .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 
     /* Layout */
     .main{display:flex;flex:1;overflow:hidden}
-    .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+    .sidebar{width:220px;background:#f8faff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
     .content{flex:1;overflow-y:auto;padding:24px}
 
     /* Sidebar */
@@ -46,7 +46,7 @@
 
     /* Cards */
     .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
     .card-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
     .card-val{font-size:22px;font-weight:800}
     .card-sub{font-size:11px;color:var(--muted);margin-top:3px}
@@ -60,9 +60,9 @@
     .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:7px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s}
     .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#3a7ae0}
     .btn-primary:disabled{opacity:.5;cursor:not-allowed}
-    .btn-success{background:var(--green);color:#0f1117}.btn-success:hover{background:#2ab36b}
-    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-    .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-success{background:var(--green);color:#ffffff;font-weight:700}.btn-success:hover{background:#2ab36b}
+    .btn-ghost{background:transparent;border:1px solid #cbd5e1;color:#475569}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:#eff6ff}
     .btn-sm{padding:5px 10px;font-size:11px}
 
     /* Drop zone */
@@ -129,9 +129,9 @@
     .entity-cicuk{background:rgba(245,158,11,.15);color:var(--cicuk);border:1px solid rgba(245,158,11,.3)}
 
     /* Table */
-    .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
     table{width:100%;border-collapse:collapse;font-size:12px}
-    th{text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--surface)}
+    th{text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:#f8faff}
     td{padding:10px 14px;border-bottom:1px solid rgba(46,51,80,.4);vertical-align:middle}
     tr:last-child td{border-bottom:none}
     tr:hover td{background:rgba(79,142,247,.03)}
@@ -164,7 +164,7 @@
     .empty-state p{font-size:13px;line-height:1.6}
 
     .toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;display:none;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.4)}
-    .toast.success{background:var(--green);color:#0f1117}
+    .toast.success{background:var(--green);color:#fff}
     .toast.error{background:var(--red);color:#fff}
     .toast.info{background:var(--accent);color:#fff}
   </style>
@@ -179,7 +179,7 @@
       <div class="header-sub">Gremax SG · CIC · CIC EU · CIC UK</div>
     </div>
     <div class="header-right">
-      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.5);color:#fff" onclick="exportCSV()">⬇ Export CSV</button>
     </div>
   </div>
 
@@ -189,6 +189,7 @@
       <div class="nav-item active" onclick="switchPanel('capture',this)"><span class="nav-icon">📧</span> Capture Payment</div>
       <div class="nav-item" onclick="switchPanel('aplist',this)"><span class="nav-icon">📋</span> AP List</div>
       <div class="nav-item" onclick="switchPanel('cashflow',this)"><span class="nav-icon">📊</span> Cash Flow</div>
+      <div class="nav-item" onclick="switchPanel('suppliers',this)"><span class="nav-icon">🏢</span> Supplier List</div>
       <div class="co-section">
         <div class="co-label">Filter by Entity</div>
         <button class="co-btn active" data-co="all" onclick="setCoFilter('all',this)"><span class="co-dot dot-all"></span> All Entities</button>
@@ -252,7 +253,7 @@
             <div id="entityBadgeWrap"></div>
             <div class="field-group">
               <div class="field-label">Paying Entity</div>
-              <select class="field-value" id="f-entity">
+              <select class="field-value" id="f-entity" onchange="updateBankOptions(this.value)">
                 <option value="gremax">Gremax SG</option>
                 <option value="cic">CIC</option>
                 <option value="ciceu">CIC EU</option>
@@ -260,8 +261,8 @@
               </select>
             </div>
             <div class="field-group">
-              <div class="field-label">Vendor</div>
-              <input class="field-value" id="f-vendor" type="text" placeholder="Vendor name"/>
+              <div class="field-label">Supplier / Paid To</div>
+              <input class="field-value" id="f-vendor" type="text" placeholder="Company name on invoice"/>
             </div>
             <div class="field-group">
               <div class="field-label">On Behalf Of (Client)</div>
@@ -290,6 +291,10 @@
               <input class="field-value" id="f-invoice" type="text" placeholder="INV-XXXX"/>
             </div>
             <div class="field-group">
+              <div class="field-label">BL No. (Bill of Lading)</div>
+              <input class="field-value" id="f-bl" type="text" placeholder="BL number (if applicable)"/>
+            </div>
+            <div class="field-group">
               <div class="field-label">Approval Status</div>
               <div class="flow-steps">
                 <div class="flow-step current" id="flow-pending"><span class="si">📥</span>Pending</div>
@@ -306,6 +311,10 @@
             <div class="field-group">
               <div class="field-label">Payment Advice / Notes</div>
               <input class="field-value" id="f-notes" type="text" placeholder="Payment advice ref after payment"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Bank Account</div>
+              <select class="field-value" id="f-bank"></select>
             </div>
             <div class="field-group">
               <div class="field-label">Payment Mode</div>
@@ -352,6 +361,51 @@
         </div>
       </div>
 
+      <!-- SUPPLIER LIST -->
+      <div class="panel" id="panel-suppliers">
+        <div class="section-header">
+          <div class="section-title">Supplier List</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddSupplier()">+ Add Supplier</button>
+        </div>
+        <p style="font-size:11.5px;color:var(--muted);margin-bottom:16px">
+          Short names / aliases are used to auto-match when reading .msg files. The formal name is used in the Excel AP List export.
+        </p>
+
+        <!-- Add/Edit form -->
+        <div id="supplierForm" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:18px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:14px" id="supplierFormTitle">Add Supplier</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field-group" style="margin:0">
+              <div class="field-label">Formal Name (on invoice)</div>
+              <input class="field-value" id="sf-formal" type="text" placeholder="e.g. VANSAIL GLOBAL EXPRESS CO.,LIMITED"/>
+            </div>
+            <div class="field-group" style="margin:0">
+              <div class="field-label">Short Name / Alias (in email)</div>
+              <input class="field-value" id="sf-alias" type="text" placeholder="e.g. 正佳, Vansail, BDP"/>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="btn btn-success" onclick="saveSupplier()">💾 Save</button>
+            <button class="btn btn-ghost" onclick="closeSupplierForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Formal Name (Invoice)</th>
+              <th>Aliases (auto-match)</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="supplierTableBody"></tbody>
+          </table>
+          <div id="supplierEmpty" class="empty-state" style="display:none">
+            <div class="emoji">🏢</div>
+            <p>No suppliers yet.<br/>Click "+ Add Supplier" to get started.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- CASH FLOW -->
       <div class="panel" id="panel-cashflow">
         <div class="section-header">
@@ -381,12 +435,102 @@ let coFilter = 'all';
 let apStatusFilter = 'all';
 let cfStatusFilter = 'all';
 
+// ── Vendor alias map (short name → formal AP List name) ──
+const VENDOR_MAP = {
+  'bdp': 'BDP Asia Pacific',
+  'bdp asia': 'BDP Asia Pacific',
+  'vansail': 'VANSAIL GLOBAL EXPRESS CO.,LIMITED',
+  '正佳': 'VANSAIL GLOBAL EXPRESS CO.,LIMITED',
+  'oec': 'OEC Thailand',
+  'orient express': 'Orient Express Container (Thailand)',
+  'k-apex': 'K-Apex Logistics(Hk)',
+  'rich shipping': 'Rich Shipping Int Freight(Hk)',
+  'qingdao dsi': 'Qingdao DSI Logistics',
+  'unitalen': 'Unitalen Attorneys At Law Co Ltd',
+  'niter': 'Niter Creation Design',
+  'pravin': 'Pravin Makunda Chaudhari',
+  'raymond': 'Raymond Chin',
+  'detroit': 'Detroit Legal Consulting',
+  'kuniya': 'Kuniya',
+  'suzhou jupin': 'Suzhou Jupin Network',
+  'first rubber': 'First Rubber',
+  'l m associates': 'L M Associates Pty Ltd',
+};
+
+// ── Description translation map (Chinese keywords → English) ──
+const DESC_MAP = [
+  ['港杂费', 'port charges'],
+  ['本地费用', 'local charges'],
+  ['local charges', 'local charges'],
+  ['海运费', 'sea freight charges'],
+  ['运费', 'freight charges'],
+  ['海运', 'ocean freight charges'],
+  ['仓储费', 'warehousing charges'],
+  ['仓租', 'storage charges'],
+  ['报关费', 'customs clearance charges'],
+  ['关税', 'duty fee'],
+  ['进口税', 'import duty'],
+  ['入仓费', 'shipment entry fee'],
+  ['顾问费', 'consultation fee'],
+  ['咨询费', 'consultation fee'],
+  ['商标', 'trademark'],
+  ['专利', 'patent'],
+  ['注册费', 'registration fee'],
+  ['设计费', 'design fee'],
+  ['装修', 'construction'],
+  ['展览', 'exhibition'],
+  ['差旅', 'travel reimbursement'],
+  ['报销', 'reimbursement'],
+  ['律师费', 'legal fee'],
+  ['猎头费', 'headhunter fee'],
+  ['人头费', 'headhunter fee'],
+  ['工资', 'salary'],
+  ['薪资', 'salary'],
+  ['佣金', 'commission'],
+];
+
+function translateDesc(text) {
+  if (!text) return text;
+  let result = text;
+  for (const [zh, en] of DESC_MAP) {
+    if (result.toLowerCase().includes(zh.toLowerCase())) {
+      // Replace Chinese keyword with English equivalent
+      result = result.replace(new RegExp(zh, 'gi'), en);
+    }
+  }
+  return result;
+}
+
+function formalVendorName(vendor) {
+  if (!vendor) return vendor;
+  const key = vendor.trim().toLowerCase();
+  for (const [alias, formal] of Object.entries(VENDOR_MAP)) {
+    if (key.includes(alias)) return formal;
+  }
+  return vendor; // return as-is if no match
+}
+
 const COMPANIES = {
   gremax:{ label:'Gremax SG', dot:'dot-gremax', cls:'entity-gremax' },
   cic:   { label:'CIC',       dot:'dot-cic',    cls:'entity-cic'    },
   ciceu: { label:'CIC EU',    dot:'dot-ciceu',  cls:'entity-ciceu'  },
   cicuk: { label:'CIC UK',    dot:'dot-cicuk',  cls:'entity-cicuk'  },
 };
+
+// ── Entity → Bank options ──
+const ENTITY_BANKS = {
+  gremax: ['HSBC','Citibank','SCB'],
+  cic:    ['UOB','Citibank'],
+  ciceu:  ['Wise','ING'],
+  cicuk:  ['Wise'],
+};
+
+function updateBankOptions(entity) {
+  const sel = document.getElementById('f-bank');
+  if (!sel) return;
+  const banks = ENTITY_BANKS[entity] || ['SCB'];
+  sel.innerHTML = banks.map(b => `<option value="${b}">${b}</option>`).join('');
+}
 
 // ── Drag & drop ──
 const dz = document.getElementById('dropZone');
@@ -471,20 +615,156 @@ async function handleMsg(file) {
   // Extract attachment names (look for .xls .xlsx .pdf strings)
   const attachments = strings.filter(s => /\.(xls|xlsx|pdf)$/i.test(s) && s.length < 80);
 
+  // Extract Invoice No + Supplier from embedded Excel attachments
+  let attachmentInvoice = '';
+  let attachmentSupplier = '';
+  try {
+    // Find all ZIP/Excel signatures (PK header) in the buffer
+    const bytes = new Uint8Array(buf);
+    for (let i = 0; i < bytes.length - 4; i++) {
+      if (bytes[i]===0x50 && bytes[i+1]===0x4B && bytes[i+2]===0x03 && bytes[i+3]===0x04) {
+        try {
+          const chunk = buf.slice(i);
+          const zip = await new Promise((res,rej) => {
+            // Use JSZip if available, else try native
+            const blob = new Blob([chunk]);
+            const reader = new FileReader();
+            reader.onload = e => {
+              try {
+                // Parse as zip manually - look for sharedStrings.xml
+                const data = e.target.result;
+                const text = new TextDecoder('utf-8').decode(new Uint8Array(data)).replace(/[^ -~一-鿿]/g,' ');
+                res(text);
+              } catch(ex) { rej(ex); }
+            };
+            reader.readAsArrayBuffer(blob.slice(0, 200000));
+          });
+        } catch(e) {}
+      }
+    }
+    // Simpler: search for invoice pattern directly in raw UTF-16 strings
+    for (const s of strings) {
+      // Invoice No patterns: TGHK-xxx, INV-xxx, alphanumeric with dashes
+      if (!attachmentInvoice && /^[A-Z0-9]{3,}-[A-Z0-9\-]{3,}$/.test(s) && s.length < 30) {
+        attachmentInvoice = s;
+      }
+      // Supplier: all-caps company name with CO./LTD/PTE etc
+      if (!attachmentSupplier && /(CO\.|LTD|PTE|INC|CORP|LIMITED|INTERNATIONAL)/.test(s) && s.length > 10 && s.length < 80) {
+        attachmentSupplier = s;
+      }
+    }
+  } catch(e) {}
+
+  // Use already-extracted UTF-16 strings for keyword detection (more reliable than UTF-8 body)
+  const bodyText = strings.join(' ').toLowerCase();
+
   showAiStatus(false);
 
-  if (subject) {
-    document.getElementById('paste-subject').value = subject;
-    const p = parseSubject(subject);
-    const entity = detectEntity(subject);
-    // Use sender domain to help confirm entity if not found in subject
-    const resolvedEntity = entity || detectEntityFromEmail(sender);
-    populateForm({ ...p, entity: resolvedEntity });
-    showPreview({ ...p, entity: resolvedEntity, sender, attachments });
-    showToast('✅ Email parsed — please review and save', 'success');
+  if (!subject) { showToast('Could not read subject — please paste it manually','error'); return; }
+
+  // ── Detect if this is a REPLY email ──
+  const isReply = /^re:/i.test(subject);
+
+  if (isReply) {
+    // Strip "Re:" and any prefix like "Gremax SG - " to get original subject
+    const stripped = subject
+      .replace(/^re:[\s]*/i,'')
+      .replace(/^(Gremax SG|CIC EU|CIC UK|CIC|Gremax)[\s]*-[\s]*/i,'')
+      .trim();
+
+    // Detect who sent the reply
+    const isFromZhangYu = sender.includes('yuz@gremax') || sender.includes('zhang.yu') || sender.includes('zhangyu');
+    const isFromSandra  = sender.includes('sandra');
+
+    // Detect keywords in body
+    const approveKeywords = ['approve','approved','ok to pay','can pay','proceed','同意','批准'];
+    const payAdviceKeywords = ['payment advice','payment made','pa-','paid','transferred','remittance','fyi','for your info','attached herewith'];
+    const rejectKeywords = ['reject','decline','hold','do not pay','不批','不同意'];
+
+    const hasApproveKw = approveKeywords.some(k => bodyText.includes(k));
+    const hasPayKw     = payAdviceKeywords.some(k => bodyText.includes(k));
+    const isRejected   = rejectKeywords.some(k => bodyText.includes(k));
+
+    // Logic: Zhang Yu reply → Approved; Sandra reply → Paid; keywords override
+    const isApproval = !isRejected && (isFromZhangYu || hasApproveKw) && !isFromSandra;
+    const isPayment  = !isRejected && (isFromSandra || hasPayKw);
+
+    // Extract payment advice number if paid
+    let payAdvice = '';
+    const paMatch = bodyText.match(/pa[-\s]?(\w+)/i) || bodyText.match(/advice[:\s]+([a-z0-9\-]+)/i);
+    if (paMatch) payAdvice = paMatch[0].toUpperCase();
+
+    // Find matching record
+    const matched = records.find(r => {
+      const rSubject = (r.emailSubject||'').toLowerCase();
+      const sStripped = stripped.toLowerCase();
+      return rSubject.includes(sStripped) || sStripped.includes(rSubject.replace(/^(gremax sg|cic eu|cic uk|cic|gremax)[\s]*-[\s]*/i,''));
+    });
+
+    if (matched) {
+      const newStatus = isRejected ? 'rejected' : isPayment ? 'paid' : isApproval ? 'approved' : null;
+      if (newStatus) {
+        const oldStatus = matched.status;
+        matched.status = newStatus;
+        matched.approvedby = sender || matched.approvedby;
+        if (newStatus === 'approved') {
+          matched.approvedAt = new Date().toISOString();
+          matched.approvedBy = sender;
+        }
+        if (newStatus === 'paid') {
+          matched.paidAt = new Date().toISOString();
+          matched.payAdvice = payAdvice;
+        }
+        save();
+        renderAP();
+        renderCF();
+
+        const statusLabels = { approved:'✅ Approved', paid:'💸 Paid', rejected:'❌ Rejected' };
+        showToast(`${statusLabels[newStatus]} — record updated for: ${stripped.slice(0,40)}`, 'success');
+
+        // Show update summary
+        showUpdateSummary(matched, oldStatus, newStatus, sender);
+      } else {
+        showToast('Reply detected but no clear approval/payment keyword found. Please update status manually.','info');
+      }
+    } else {
+      showToast(`Reply email detected but no matching record found for: "${stripped.slice(0,50)}" — make sure the original email was saved first.`,'error');
+    }
   } else {
-    showToast('Could not read subject — please paste it manually', 'error');
+    // Normal new payment email
+    document.getElementById('paste-subject').value = subject;
+    const p = parseSubject(subject, attachments);
+    const entity = detectEntity(subject);
+    const resolvedEntity = entity || detectEntityFromEmail(sender);
+    populateForm({ ...p, entity: resolvedEntity, attachmentInvoice, attachmentSupplier });
+    showPreview({ ...p, entity: resolvedEntity, sender, attachments, attachmentInvoice, attachmentSupplier });
+    showToast('✅ Email parsed — please review and save', 'success');
   }
+}
+
+function showUpdateSummary(rec, oldStatus, newStatus, sender) {
+  const co = COMPANIES[rec.entity];
+  const statusIcons = { pending:'⏳', approved:'✅', paid:'💸', rejected:'❌' };
+  let box = document.getElementById('excelRowBox');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'excelRowBox';
+    box.style.cssText = 'background:var(--surface);border-radius:10px;padding:16px;margin-top:16px;';
+    document.querySelector('.capture-layout').insertAdjacentElement('afterend', box);
+  }
+  box.style.border = newStatus==='approved'?'1px solid var(--green)':newStatus==='paid'?'1px solid var(--purple)':'1px solid var(--red)';
+  box.innerHTML = `
+    <div style="font-size:12px;font-weight:700;margin-bottom:10px;color:${newStatus==='approved'?'var(--green)':newStatus==='paid'?'var(--purple)':'var(--red)'}">
+      ${statusIcons[newStatus]} Status Updated from ${statusIcons[oldStatus]} ${oldStatus.toUpperCase()} → ${newStatus.toUpperCase()}
+    </div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8">
+      <div><span style="color:var(--text);font-weight:600">Record:</span> ${esc(rec.supplier||rec.vendor)} · ${rec.currency} ${Number(rec.amount).toLocaleString('en',{minimumFractionDigits:2})}</div>
+      <div><span style="color:var(--text);font-weight:600">By:</span> ${esc(sender)}</div>
+      <div><span style="color:var(--text);font-weight:600">On:</span> ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+      ${rec.payAdvice?`<div><span style="color:var(--text);font-weight:600">Payment Advice:</span> ${esc(rec.payAdvice)}</div>`:''}
+    </div>
+    <div style="font-size:10.5px;color:var(--muted);margin-top:8px">AP List and Cash Flow have been updated automatically.</div>
+  `;
 }
 
 function detectEntityFromEmail(email) {
@@ -610,14 +890,23 @@ function toBase64(file) {
 
 // ── Populate form from AI result ──
 function populateForm(p) {
-  if (p.entity) document.getElementById('f-entity').value = p.entity;
-  if (p.vendor) document.getElementById('f-vendor').value = p.vendor;
+  if (p.entity) {
+    document.getElementById('f-entity').value = p.entity;
+    updateBankOptions(p.entity);
+  }
+  // Use attachment supplier name if available, else formal name lookup, else raw vendor
+  const supplierName = p.attachmentSupplier || formalVendorName(p.vendor) || p.vendor || '';
+  if (supplierName) document.getElementById('f-vendor').value = supplierName;
   if (p.client) document.getElementById('f-client').value = p.client;
   if (p.amount) document.getElementById('f-amount').value = p.amount;
   if (p.currency) document.getElementById('f-currency').value = p.currency;
   if (p.dueDate) document.getElementById('f-duedate').value = p.dueDate;
-  if (p.description) document.getElementById('f-desc').value = p.description;
+  // Auto-translate description
+  if (p.description) document.getElementById('f-desc').value = translateDesc(p.description);
   if (p.invoice) document.getElementById('f-invoice').value = p.invoice;
+  // Also set invoice no + supplier from attachment if available
+  if (p.attachmentInvoice) document.getElementById('f-invoice').value = p.attachmentInvoice;
+  if (p.attachmentSupplier) document.getElementById('f-supplier').value = p.attachmentSupplier;
   renderEntityBadge(p.entity);
 }
 
@@ -625,7 +914,7 @@ function showPreview(p) {
   const co = COMPANIES[p.entity];
   const fields = [
     ['Entity', co ? co.label : (p.entity||'—')],
-    ['Vendor', p.vendor||'—'],
+    ['Supplier / Paid To', (p.attachmentSupplier || p.vendor)||'—'],
     ['Client', p.client||'—'],
     ['Amount', p.amount ? `${p.currency} ${Number(p.amount).toLocaleString('en',{minimumFractionDigits:2})}` : '—'],
     ['Due Date', p.dueDate||'—'],
@@ -644,7 +933,7 @@ function showPreview(p) {
 function extractFromPaste() {
   const subject = document.getElementById('paste-subject').value.trim();
   if (!subject) { showToast('Please enter the email subject','error'); return; }
-  const p = parseSubject(subject);
+  const p = parseSubject(subject, []);
   const entity = detectEntity(subject);
   populateForm({ ...p, entity });
   showToast('✅ Extracted from subject — please review','success');
@@ -659,50 +948,74 @@ function detectEntity(text) {
   return null;
 }
 
-function parseSubject(subject) {
-  // Two formats:
+function parseSubject(subject, attachmentNames) {
+  // Three formats:
   // A) "CIC付款申请-雄鹰香港-$18,116.90-6.18付"
-  //    → entity=CIC, vendor=雄鹰香港, amount=18116.90, due=06-18
+  //    → entity=CIC, vendor=雄鹰香港
   // B) "BDP-Tredit泰国发港杂费付款-$857.48-7.10日前"
-  //    → vendor=BDP, client=Tredit, desc=泰国发港杂费付款, amount=857.48, due=07-10
+  //    → vendor=BDP, client=Tredit
+  // C) "CIC户头- 海运费关税付款申请-$52,711.85--1.10前付"
+  //    → entity=CIC, no vendor in subject → get from attachment name
 
   const year = new Date().getFullYear();
-  const parts = subject.split('-');
-
-  // ── Detect entity from first segment ──
-  const first = parts[0].trim();
+  const parts = subject.split('-').map(p => p.trim()).filter(p => p.length > 0);
+  const first = parts[0];
   const entity = detectEntity(first);
-
-  // Known client names that may appear in subject
-  const KNOWN_CLIENTS = ['Tredit','tredit'];
+  const KNOWN_CLIENTS = ['Tredit'];
 
   let vendor = '';
   let client = '';
   let description = '';
 
   if (entity) {
-    // Format A: first segment IS the entity (e.g. "CIC付款申请")
-    // → vendor = second segment
-    vendor = (parts[1] || '').trim();
-    description = first.replace(/^(CIC EU|CIC UK|CIC|Gremax SG|Gremax)/i,'').replace(/付款申请|付款/g,'').trim();
+    // Strip entity keyword from first segment to get description
+    description = first
+      .replace(/^(CIC EU|CIC UK|CIC|Gremax SG|Gremax)/i, '')
+      .replace(/付款申请|付款|户头/g, '')
+      .trim();
+
+    // Check if second segment is a vendor name (no digits, no $, not a description)
+    const seg2 = parts[1] || '';
+    const isVendorSeg = seg2.length > 0
+      && !/[$\d]/.test(seg2)
+      && !/付款|申请|费|税|运|仓|报/.test(seg2); // not description keywords
+
+    if (isVendorSeg) {
+      vendor = seg2;
+    } else {
+      // No vendor in subject — extract from attachment filename
+      // e.g. "正佳-CIC3.pdf" → "正佳"
+      if (attachmentNames && attachmentNames.length) {
+        for (const att of attachmentNames) {
+          // Skip images
+          if (/\.(png|jpg|jpeg|gif)$/i.test(att)) continue;
+          // Take part before first - or _
+          const m = att.match(/^([^\-_\.]+)/);
+          if (m && m[1].length > 1 && !/^Insert/i.test(m[1])) {
+            vendor = m[1].trim();
+            break;
+          }
+        }
+      }
+      // If still no vendor, use description from subject
+      if (!vendor) vendor = seg2 || description;
+      // Combine description
+      if (seg2 && seg2 !== vendor) description = (description + ' ' + seg2).trim();
+    }
   } else {
-    // Format B: first segment is vendor (e.g. "BDP")
+    // Format B: first segment is vendor
     vendor = first;
-    // Second segment may be "ClientDesc" like "Tredit泰国发港杂费付款"
-    const seg2 = (parts[1] || '').trim();
-    // Check if seg2 starts with a known client name
+    const seg2 = parts[1] || '';
     let foundClient = null;
     for (const kc of KNOWN_CLIENTS) {
       if (seg2.toLowerCase().startsWith(kc.toLowerCase())) {
-        foundClient = kc;
-        break;
+        foundClient = kc; break;
       }
     }
     if (foundClient) {
       client = foundClient;
       description = seg2.slice(foundClient.length).trim();
     } else {
-      // No known client — treat whole seg2 as description
       description = seg2;
     }
   }
@@ -784,8 +1097,10 @@ function saveRecord() {
     client:document.getElementById('f-client').value.trim(),
     desc:document.getElementById('f-desc').value.trim(),
     invoice:document.getElementById('f-invoice').value.trim(),
+    bl:document.getElementById('f-bl').value.trim(),
     status:currentStatus,
     notes:document.getElementById('f-notes').value.trim(),
+    bank:document.getElementById('f-bank').value,
     paymode:document.getElementById('f-paymode').value,
     approvedby:document.getElementById('f-approvedby').value.trim(),
     capturedAt:new Date().toISOString(),
@@ -794,7 +1109,7 @@ function saveRecord() {
   save();
   showExcelRow(rec);
   showToast('✅ Record saved! Copy the row below into Excel.','success');
-  ['f-vendor','f-client','f-amount','f-duedate','f-desc','f-invoice','f-notes','f-approvedby','paste-subject'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  ['f-vendor','f-client','f-amount','f-duedate','f-desc','f-invoice','f-notes','f-approvedby','f-bl','paste-subject'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
   document.getElementById('entityBadgeWrap').innerHTML='';
   document.getElementById('extractedPreview').classList.remove('active');
   document.getElementById('fileInput').value='';
@@ -807,27 +1122,21 @@ function save(){ localStorage.setItem('pt_records',JSON.stringify(records)); }
 
 // ── Excel row export ──
 function showExcelRow(rec) {
-  // Generate AP number based on count for this entity+currency
   const entityRecs = records.filter(r => r.entity === rec.entity && r.currency === rec.currency);
   const apNum = String(entityRecs.length).padStart(2,'0');
-
-  // Booking description formula (matches their Excel pattern)
-  const bookingDesc = `AP${apNum}_${COMPANIES[rec.entity]?.label||rec.entity}_SCB${rec.currency}_${rec.vendor}${rec.invoice ? '- Inv No. '+rec.invoice : ''}_${rec.desc}`;
-
+  const bank = rec.bank || 'SCB';
+  const bookingDesc = `AP${apNum}_${COMPANIES[rec.entity]?.label||rec.entity}_${bank}${rec.currency}_${rec.supplier||rec.vendor}${rec.invoice ? '- Inv No. '+rec.invoice : ''}_${rec.desc}`;
   const invoiceDate = rec.capturedAt.slice(0,10);
+  const hasBL = bank !== 'SCB';
   const cols = [
-    apNum,
-    invoiceDate,
-    rec.invoice || '',
-    rec.vendor + (rec.client ? ' ('+rec.client+')' : ''),
-    Number(rec.amount).toFixed(2),
-    rec.desc,
-    rec.dueDate,
-    bookingDesc,
-    rec.paymode,
-    rec.approvedby,
+    apNum, invoiceDate, rec.invoice||'',
+    rec.supplier || rec.vendor + (rec.client?' ('+rec.client+')':''),
+    Number(rec.amount).toFixed(2), rec.desc,
+    ...(hasBL ? [rec.bl||''] : []),
+    rec.dueDate, bookingDesc, rec.paymode, rec.approvedby,
   ];
-  const tsv = cols.join('\t'); // tab-separated for Excel paste
+  const headers = ['AP N°','Inv Date','Invoice No','Supplier','Amount',...(hasBL?['BL No.']:[]),'Due Date','Booking Desc','Mode','Approved By'];
+  const tsv = cols.join('\t');
 
   // Show copy UI
   let box = document.getElementById('excelRowBox');
@@ -845,7 +1154,7 @@ function showExcelRow(rec) {
     <div style="overflow-x:auto">
       <table style="font-size:11px;width:100%;border-collapse:collapse">
         <thead>
-          <tr>${['AP N°','Inv Date','Invoice No','Supplier','Amount','Description','Due Date','Booking Desc','Mode','Approved By'].map(h=>`<th style="padding:4px 8px;color:var(--muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap">${h}</th>`).join('')}</tr>
+          <tr>${headers.map(h=>`<th style="padding:4px 8px;color:var(--muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap">${h}</th>`).join('')}</tr>
         </thead>
         <tbody>
           <tr style="background:var(--surface2)">${cols.map(v=>`<td style="padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis">${esc(String(v))}</td>`).join('')}</tr>
@@ -858,8 +1167,9 @@ function showExcelRow(rec) {
 
 function getSheetName(rec) {
   const entity = COMPANIES[rec.entity]?.label || rec.entity;
-  const prefix = entity === 'Gremax SG' ? 'GM' : entity.replace(/\s/g,'');
-  return `${prefix}-${rec.currency}`;
+  const prefix = entity === 'Gremax SG' ? 'GM' : entity.replace(/[\s-]/g,'');
+  const bank = rec.bank || 'SCB';
+  return `${prefix}-${bank}${rec.currency}`;
 }
 
 function copyExcelRow(tsv) {
@@ -879,13 +1189,14 @@ function switchPanel(name, el) {
   if(el) el.classList.add('active');
   if(name==='aplist') renderAP();
   if(name==='cashflow') renderCF();
+  if(name==='suppliers') renderSuppliers();
 }
 
 function setCoFilter(co, btn) {
   coFilter=co;
   document.querySelectorAll('.co-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderAP(); renderCF();
+  renderAP(); renderCF(); updateBankOptions('gremax');
 }
 
 function setApStatus(s){ apStatusFilter=s; renderAP(); }
@@ -938,7 +1249,7 @@ function cycleStatus(id){
 }
 function del(id){
   if(!confirm('Delete this record?')) return;
-  records=records.filter(r=>r.id!==id); save(); renderAP(); renderCF();
+  records=records.filter(r=>r.id!==id); save(); renderAP(); renderCF(); updateBankOptions('gremax');
 }
 
 // ── Cash Flow ──
@@ -959,31 +1270,58 @@ function renderCF() {
     <div class="card"><div class="card-label">Due This Month</div><div class="card-val" style="color:var(--yellow)">${active.filter(r=>r.dueDate.slice(0,7)===new Date().toISOString().slice(0,7)).length}</div><div class="card-sub">${fmt(thisMonthAmt)}</div></div>`;
   const entities=coFilter==='all'?['gremax','cic','ciceu','cicuk']:[coFilter];
   let html='';
+
   entities.forEach(ent=>{
     const er=active.filter(r=>r.entity===ent); if(!er.length) return;
     const co=COMPANIES[ent];
     const eTotal=er.reduce((s,r)=>s+r.amount,0);
-    const byMonth={};
-    er.forEach(r=>{ const k=r.dueDate.slice(0,7); if(!byMonth[k]) byMonth[k]=[]; byMonth[k].push(r); });
+
+    // Group by bank within this entity
+    const banks=[...new Set(er.map(r=>r.bank||'SCB'))].sort();
+
     html+=`<div class="cf-entity-block">
-      <div class="cf-entity-header"><span class="co-dot ${co.dot}"></span><span class="cf-entity-name">${co.label}</span><span class="cf-entity-total">${fmt(eTotal)}</span></div>`;
-    Object.keys(byMonth).sort().forEach(month=>{
-      const items=byMonth[month].sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
-      const mTotal=items.reduce((s,r)=>s+r.amount,0);
-      const mLabel=new Date(month+'-01').toLocaleDateString('en-GB',{year:'numeric',month:'long'});
-      html+=`<div class="cf-month"><div class="cf-month-label">${mLabel}</div>`;
-      items.forEach(r=>{
-        const due=new Date(r.dueDate); const diff=Math.ceil((due-today)/86400000);
-        const dCls=diff<0?'overdue':diff<=7?'due-soon':'';
-        const sIcon={pending:'⏳',approved:'✅',paid:'💸'}[r.status]||'';
-        const dTag=diff<0?`<span class="overdue"> · ${Math.abs(diff)}d overdue</span>`:diff<=7&&diff>=0?`<span class="due-soon"> · Due soon</span>`:'';
-        html+=`<div class="cf-row">
-          <div><div class="cf-vendor">${esc(r.vendor)}${r.client?` · <span style="color:var(--muted);font-weight:400">${esc(r.client)}</span>`:''}</div>
-          <div class="cf-meta ${dCls}">${r.dueDate} ${sIcon}${r.desc?' · '+esc(r.desc):''}${dTag}</div></div>
-          <div class="cf-amount">${r.currency} ${Number(r.amount).toLocaleString('en',{minimumFractionDigits:2})}</div>
+      <div class="cf-entity-header">
+        <span class="co-dot ${co.dot}"></span>
+        <span class="cf-entity-name">${co.label}</span>
+        <span class="cf-entity-total">${fmt(eTotal)}</span>
+      </div>`;
+
+    banks.forEach(bank=>{
+      const bankRecs=er.filter(r=>(r.bank||'SCB')===bank);
+      if(!bankRecs.length) return;
+      const bankTotal=bankRecs.reduce((s,r)=>s+r.amount,0);
+
+      // Group by month within bank
+      const byMonth={};
+      bankRecs.forEach(r=>{ const k=r.dueDate.slice(0,7); if(!byMonth[k]) byMonth[k]=[]; byMonth[k].push(r); });
+
+      html+=`<div style="border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:rgba(255,255,255,0.02)">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">🏦 ${bank}</div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted)">${fmt(bankTotal)}</div>
         </div>`;
+
+      Object.keys(byMonth).sort().forEach(month=>{
+        const items=byMonth[month].sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+        const mTotal=items.reduce((s,r)=>s+r.amount,0);
+        const mLabel=new Date(month+'-01').toLocaleDateString('en-GB',{year:'numeric',month:'long'});
+        html+=`<div class="cf-month"><div class="cf-month-label">${mLabel}</div>`;
+        items.forEach(r=>{
+          const due=new Date(r.dueDate); const diff=Math.ceil((due-today)/86400000);
+          const dCls=diff<0?'overdue':diff<=7?'due-soon':'';
+          const sIcon={pending:'⏳',approved:'✅',paid:'💸'}[r.status]||'';
+          const dTag=diff<0?`<span class="overdue"> · ${Math.abs(diff)}d overdue</span>`:diff<=7&&diff>=0?`<span class="due-soon"> · Due soon</span>`:'';
+          html+=`<div class="cf-row">
+            <div>
+              <div class="cf-vendor">${esc(r.supplier||r.vendor)}${r.client?` · <span style="color:var(--muted);font-weight:400">${esc(r.client)}</span>`:''}</div>
+              <div class="cf-meta ${dCls}">${r.dueDate} ${sIcon}${r.desc?' · '+esc(r.desc):''}${dTag}</div>
+            </div>
+            <div class="cf-amount">${r.currency} ${Number(r.amount).toLocaleString('en',{minimumFractionDigits:2})}</div>
+          </div>`;
+        });
+        html+=`<div class="cf-month-total"><span class="cf-month-total-label">Monthly total</span><span class="cf-month-total-val">${fmt(mTotal)}</span></div></div>`;
       });
-      html+=`<div class="cf-month-total"><span class="cf-month-total-label">Monthly total</span><span class="cf-month-total-val">${fmt(mTotal)}</span></div></div>`;
+      html+=`</div>`;
     });
     html+=`</div>`;
   });
@@ -1009,7 +1347,162 @@ function showToast(msg,type='info'){
   setTimeout(()=>t.style.display='none',3500);
 }
 
-renderAP(); renderCF();
+renderAP(); renderCF(); updateBankOptions('gremax');
+
+// ── Supplier List ──
+const DEFAULT_SUPPLIERS = [
+  { formal: 'BDP Asia Pacific', aliases: ['bdp','bdp asia','bdp asia pacific','bdp asia-pacific ltd'] },
+  { formal: 'VANSAIL GLOBAL EXPRESS CO., LIMITED', aliases: ['vansail','正佳','vansail global','vansail global express'] },
+  { formal: 'Orient Express Container (Thailand)', aliases: ['oec','oec thailand','orient express','orient express container'] },
+  { formal: 'K-Apex Logistics(Hk)', aliases: ['k-apex','k apex','k-apex log'] },
+  { formal: 'Rich Shipping Int Freight(Hk)', aliases: ['rich shipping'] },
+  { formal: 'Qingdao DSI Logistics', aliases: ['qingdao dsi','dsi logistics'] },
+  { formal: 'Unitalen Attorneys At Law Co Ltd', aliases: ['unitalen'] },
+  { formal: 'Niter Creation Design and Exhibition', aliases: ['niter','niter creation'] },
+  { formal: 'Pravin Makunda Chaudhari', aliases: ['pravin','pravin chaudhari'] },
+  { formal: 'Chin Kong Ngiap (Raymond)', aliases: ['raymond','raymond chin'] },
+  { formal: 'Detroit Legal Consulting', aliases: ['detroit'] },
+  { formal: 'L M Associates Pty Ltd', aliases: ['l m associates','l & m associates','lm associates'] },
+  { formal: 'Himile (Thailand) Co., Ltd', aliases: ['himile thai','himile thailand','himile (thailand)'] },
+  { formal: 'Himile Mechanical Science And Technology (Shandong)', aliases: ['himile shandong','himile mechanical','himile (shandong)','himile mechanical shandong'] },
+  { formal: 'Himile Vietnam', aliases: ['himile vietnam'] },
+  { formal: 'General Rubber (Thai) Co., Ltd', aliases: ['general rubber','general rubber thai'] },
+  { formal: 'Shandong Lichond Mould Co.,Ltd.', aliases: ['lichond','shandong lichond','lichond mould','lichond thai','lichond mould thai'] },
+  { formal: 'Suzhou Jupin Network Technology Co., Ltd', aliases: ['suzhou jupin','jupin'] },
+  { formal: 'Compania Hulera Euzkadi SA de CV', aliases: ['compania hulera','hulera'] },
+  { formal: 'Wanin Industries Pte Ltd', aliases: ['wanin'] },
+  { formal: 'TN Corporate Management Pte Ltd', aliases: ['tn corporate','tn corp','tn corporate management'] },
+  { formal: 'TN Audit PAC', aliases: ['tn audit'] },
+  { formal: 'Allied World Assurance Co.', aliases: ['allied world'] },
+  { formal: 'MSIG Insurance (Singapore) Pte Ltd', aliases: ['msig'] },
+  { formal: 'QBE Insurance (International) Ltd', aliases: ['qbe','qbe insurance'] },
+  { formal: 'PICC Property And Casualty', aliases: ['picc'] },
+  { formal: 'Prudential Assurance Company Singapore', aliases: ['prudential','prudential assurance'] },
+  { formal: 'Jordan and Jordan Insurance Group', aliases: ['jordan','jordan insurance'] },
+  { formal: 'GS Thailand', aliases: ['gs thai','gs thailand'] },
+  { formal: 'Tercelo International Co., Limited', aliases: ['tercelo','tercelo int'] },
+  { formal: 'Cavendish Industries (Thailand) Co., Ltd', aliases: ['cavendish','cavendish india','cavendish industries'] },
+  { formal: 'READ BY THE MIRROR CO., LTD.', aliases: ['read by the mirror'] },
+  { formal: 'Kuniya Co., Ltd', aliases: ['kuniya'] },
+  { formal: 'Valensea Law LLC', aliases: ['valensea','valensea law'] },
+  { formal: 'Harry Elias Partnership LLP', aliases: ['harry elias'] },
+  { formal: 'Good Job Creations (Singapore) Pte Ltd', aliases: ['good job','good job creations'] },
+  { formal: 'China Great Wall International Exhibition Co., Ltd', aliases: ['china great wall','great wall exhibition'] },
+  { formal: 'Shouguang Firemax Tyre Co., Ltd', aliases: ['firemax','shouguang firemax'] },
+  { formal: 'YUANXIN TYRE CO., LTD', aliases: ['yuanxin','yuan xin tyre','yuanxin tyre','yuan xin'] },
+  { formal: 'Libra International', aliases: ['libra','libra international'] },
+  { formal: 'DHL Express (Singapore) Pte Ltd', aliases: ['dhl','dhl express'] },
+  { formal: 'Network Courier Service', aliases: ['network courier'] },
+  { formal: 'Knight Frank Pte Ltd', aliases: ['knight frank'] },
+  { formal: 'Colliers International', aliases: ['colliers','colliers int'] },
+  { formal: 'MCST Plan No. 4311', aliases: ['mcst','mcst 4311'] },
+  { formal: 'IRAS', aliases: ['iras'] },
+  { formal: 'Peace Ocean (Thailand) Co., Ltd', aliases: ['peace ocean'] },
+  { formal: 'Hongkong Properous Limited', aliases: ['hongkong properous','hk properous'] },
+  { formal: 'Deldo Autobanden NV', aliases: ['deldo'] },
+  { formal: 'Nynas Pte Ltd', aliases: ['nynas'] },
+  { formal: 'Qingdao Laoqian Management', aliases: ['laoqian','qingdao laoqian'] },
+  { formal: 'CoSeClinic Services', aliases: ['coseclinic','cose clinic'] },
+  { formal: 'CHONG MUN KIAT (Steven)', aliases: ['steven','chong mun kiat'] },
+  { formal: 'Gremax Industrial Pte Ltd', aliases: ['gremax industrial'] },
+  { formal: 'KN Hardware Pte Ltd', aliases: ['kn hardware'] },
+  { formal: 'Attorneys-at-Law Magnusson', aliases: ['magnusson','attorneys magnusson'] },
+  { formal: "King's College London", aliases: ["king's college","kings college london"] },
+  { formal: 'TARSUS SINGAPORE PTE LTD', aliases: ['tarsus','tarsus singapore'] },
+  { formal: 'Skill Development Fund', aliases: ['skill development','sdf'] },
+  { formal: 'JK Tyre India', aliases: ['jk tyre','jk india'] },
+];
+
+let suppliers = JSON.parse(localStorage.getItem('pt_suppliers') || 'null');
+if (!suppliers) {
+  suppliers = DEFAULT_SUPPLIERS;
+  localStorage.setItem('pt_suppliers', JSON.stringify(suppliers));
+}
+let editingSupplierIdx = null;
+
+function saveSuppliers() {
+  localStorage.setItem('pt_suppliers', JSON.stringify(suppliers));
+  // Rebuild VENDOR_MAP dynamically
+  rebuildVendorMap();
+}
+
+function rebuildVendorMap() {
+  // Clear and rebuild VENDOR_MAP from suppliers list
+  Object.keys(VENDOR_MAP).forEach(k => delete VENDOR_MAP[k]);
+  suppliers.forEach(s => {
+    s.aliases.forEach(alias => {
+      VENDOR_MAP[alias.toLowerCase()] = s.formal;
+    });
+  });
+}
+
+// Call on init
+rebuildVendorMap();
+
+function renderSuppliers() {
+  const tbody = document.getElementById('supplierTableBody');
+  const empty = document.getElementById('supplierEmpty');
+  if (!suppliers.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = suppliers.map((s,i) => `<tr>
+    <td style="font-weight:600;font-size:12px">${esc(s.formal)}</td>
+    <td>
+      ${s.aliases.map(a => `<span style="display:inline-block;padding:2px 8px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:10.5px;margin:2px">${esc(a)}</span>`).join('')}
+    </td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-ghost btn-sm" onclick="editSupplier(${i})">Edit</button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteSupplier(${i})">Del</button>
+    </td>
+  </tr>`).join('');
+}
+
+function openAddSupplier() {
+  editingSupplierIdx = null;
+  document.getElementById('supplierFormTitle').textContent = 'Add Supplier';
+  document.getElementById('sf-formal').value = '';
+  document.getElementById('sf-alias').value = '';
+  document.getElementById('supplierForm').style.display = 'block';
+  document.getElementById('sf-formal').focus();
+}
+
+function editSupplier(i) {
+  editingSupplierIdx = i;
+  const s = suppliers[i];
+  document.getElementById('supplierFormTitle').textContent = 'Edit Supplier';
+  document.getElementById('sf-formal').value = s.formal;
+  document.getElementById('sf-alias').value = s.aliases.join(', ');
+  document.getElementById('supplierForm').style.display = 'block';
+}
+
+function saveSupplier() {
+  const formal = document.getElementById('sf-formal').value.trim();
+  const aliasRaw = document.getElementById('sf-alias').value.trim();
+  if (!formal) { showToast('Please enter the formal name','error'); return; }
+  const aliases = aliasRaw.split(',').map(a => a.trim().toLowerCase()).filter(a => a.length > 0);
+  if (!aliases.length) { showToast('Please enter at least one alias','error'); return; }
+  
+  if (editingSupplierIdx !== null) {
+    suppliers[editingSupplierIdx] = { formal, aliases };
+  } else {
+    suppliers.push({ formal, aliases });
+  }
+  saveSuppliers();
+  renderSuppliers();
+  closeSupplierForm();
+  showToast('✅ Supplier saved!','success');
+}
+
+function deleteSupplier(i) {
+  if (!confirm('Delete this supplier?')) return;
+  suppliers.splice(i, 1);
+  saveSuppliers();
+  renderSuppliers();
+}
+
+function closeSupplierForm() {
+  document.getElementById('supplierForm').style.display = 'none';
+  editingSupplierIdx = null;
+}
 </script>
 </body>
 </html>
