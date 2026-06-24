@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Tracker</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0f1117;--surface:#1a1d27;--surface2:#222638;--border:#2e3350;
+      --accent:#4f8ef7;--green:#34c77b;--red:#f05252;--yellow:#f59e0b;--purple:#a78bfa;
+      --text:#e8eaf6;--muted:#8b90a8;--font:'Segoe UI',system-ui,sans-serif;
+      --gremax:#4f8ef7;--cic:#34c77b;--ciceu:#a78bfa;--cicuk:#f59e0b;
+    }
+    body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
+    .app{display:flex;flex-direction:column;height:100vh}
+
+    /* Header */
+    .header{background:linear-gradient(135deg,#1a1d27,#222638);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+    .header-title{font-size:17px;font-weight:700;letter-spacing:-.2px}
+    .header-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+
+    /* Layout */
+    .main{display:flex;flex:1;overflow:hidden}
+    .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+    .content{flex:1;overflow-y:auto;padding:24px}
+
+    /* Sidebar */
+    .nav-section{padding:16px 12px 8px;font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:12.5px;color:var(--muted);cursor:pointer;transition:all .18s;border-left:2px solid transparent}
+    .nav-item:hover{color:var(--text);background:var(--surface2)}
+    .nav-item.active{color:var(--accent);background:rgba(79,142,247,.08);border-left-color:var(--accent);font-weight:600}
+    .nav-item .nav-icon{font-size:15px;width:18px;text-align:center}
+    .co-section{padding:8px 12px;border-top:1px solid var(--border);margin-top:auto}
+    .co-label{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;padding:8px 4px 0}
+    .co-btn{display:flex;align-items:center;gap:7px;width:100%;padding:7px 8px;border-radius:6px;border:none;background:transparent;font-size:12px;color:var(--muted);cursor:pointer;text-align:left;transition:all .18s}
+    .co-btn:hover{background:var(--surface2);color:var(--text)}
+    .co-btn.active{color:var(--text);background:var(--surface2);font-weight:600}
+    .co-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+    .dot-all{background:var(--accent)}.dot-gremax{background:var(--gremax)}.dot-cic{background:var(--cic)}.dot-ciceu{background:var(--ciceu)}.dot-cicuk{background:var(--cicuk)}
+
+    /* Panels */
+    .panel{display:none}.panel.active{display:block}
+
+    /* Cards */
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+    .card-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+    .card-val{font-size:22px;font-weight:800}
+    .card-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+    /* Section */
+    .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .section-title{font-size:15px;font-weight:700}
+    .section-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:7px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s}
+    .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#3a7ae0}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+    .btn-success{background:var(--green);color:#0f1117}.btn-success:hover{background:#2ab36b}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-sm{padding:5px 10px;font-size:11px}
+
+    /* Drop zone */
+    .drop-zone{border:2px dashed var(--border);border-radius:12px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);margin-bottom:20px;position:relative}
+    .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(79,142,247,.06)}
+    .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .drop-icon{font-size:36px;margin-bottom:10px}
+    .drop-title{font-size:14px;font-weight:700;margin-bottom:5px}
+    .drop-sub{font-size:12px;color:var(--muted)}
+    .drop-types{display:flex;gap:8px;justify-content:center;margin-top:10px}
+    .drop-type{padding:3px 10px;border-radius:8px;font-size:10.5px;font-weight:700;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+
+    /* AI processing */
+    .ai-status{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:16px;display:none}
+    .ai-status.active{display:flex;align-items:center;gap:12px}
+    .ai-spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .ai-text{font-size:12.5px;color:var(--muted)}
+    .ai-text strong{color:var(--text)}
+
+    /* Extracted preview */
+    .extracted-preview{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:11.5px;display:none}
+    .extracted-preview.active{display:block}
+    .preview-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+    .preview-row{display:flex;gap:6px;margin-bottom:4px;align-items:baseline}
+    .preview-key{color:var(--muted);width:90px;flex-shrink:0;font-size:11px}
+    .preview-val{color:var(--text);font-weight:600}
+
+    /* Capture layout */
+    .capture-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:960px}
+    @media(max-width:750px){.capture-layout{grid-template-columns:1fr}}
+    .capture-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px}
+    .capture-card h3{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
+
+    /* Fields */
+    .field-group{margin-bottom:12px}
+    .field-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+    .field-value{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-size:12.5px;color:var(--text);width:100%;font-family:var(--font);transition:border-color .18s}
+    .field-value:focus{outline:none;border-color:var(--accent)}
+    select.field-value{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b90a8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+    .amount-row{display:flex;gap:8px}
+    .amount-row select{width:90px;flex-shrink:0}
+    .amount-row input{flex:1}
+
+    /* Flow */
+    .flow-steps{display:flex;margin-bottom:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .flow-step{flex:1;padding:9px 6px;text-align:center;font-size:10.5px;font-weight:600;color:var(--muted);border-right:1px solid var(--border)}
+    .flow-step:last-child{border-right:none}
+    .flow-step.done{color:var(--green);background:rgba(52,199,123,.07)}
+    .flow-step.current{color:var(--accent);background:rgba(79,142,247,.1)}
+    .flow-step .si{font-size:13px;display:block;margin-bottom:2px}
+    .status-row{display:flex;gap:6px;flex-wrap:wrap}
+    .status-btn{flex:1;min-width:70px;padding:7px 4px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .18s}
+    .status-btn[data-val="pending"].active{border-color:var(--yellow);color:var(--yellow);background:rgba(245,158,11,.1)}
+    .status-btn[data-val="approved"].active{border-color:var(--green);color:var(--green);background:rgba(52,199,123,.1)}
+    .status-btn[data-val="paid"].active{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1)}
+    .status-btn[data-val="rejected"].active{border-color:var(--red);color:var(--red);background:rgba(240,82,82,.1)}
+
+    /* Entity badge */
+    .entity-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:12px;font-size:11.5px;font-weight:700;margin-bottom:14px}
+    .entity-gremax{background:rgba(79,142,247,.15);color:var(--gremax);border:1px solid rgba(79,142,247,.3)}
+    .entity-cic{background:rgba(52,199,123,.15);color:var(--cic);border:1px solid rgba(52,199,123,.3)}
+    .entity-ciceu{background:rgba(167,139,250,.15);color:var(--ciceu);border:1px solid rgba(167,139,250,.3)}
+    .entity-cicuk{background:rgba(245,158,11,.15);color:var(--cicuk);border:1px solid rgba(245,158,11,.3)}
+
+    /* Table */
+    .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th{text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--surface)}
+    td{padding:10px 14px;border-bottom:1px solid rgba(46,51,80,.4);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(79,142,247,.03)}
+    .badge{display:inline-block;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700}
+    .badge-pending{background:rgba(245,158,11,.15);color:var(--yellow)}
+    .badge-approved{background:rgba(52,199,123,.15);color:var(--green)}
+    .badge-paid{background:rgba(167,139,250,.15);color:var(--purple)}
+    .badge-rejected{background:rgba(240,82,82,.12);color:var(--red)}
+
+    /* Cash flow */
+    .cf-entity-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden}
+    .cf-entity-header{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+    .cf-entity-name{font-size:13px;font-weight:700}
+    .cf-entity-total{margin-left:auto;font-size:14px;font-weight:800;color:var(--accent)}
+    .cf-month{padding:0 16px}
+    .cf-month-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:10px 0 6px;border-bottom:1px solid var(--border)}
+    .cf-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(46,51,80,.3)}
+    .cf-vendor{font-size:12.5px;font-weight:600}
+    .cf-meta{font-size:10.5px;color:var(--muted);margin-top:2px}
+    .cf-amount{font-weight:700;font-size:13px;color:var(--accent);white-space:nowrap;margin-left:12px}
+    .cf-month-total{display:flex;justify-content:space-between;padding:8px 0;font-size:11.5px;border-top:1px solid var(--border);margin-top:2px}
+    .cf-month-total-label{color:var(--muted)}
+    .cf-month-total-val{font-weight:700}
+
+    .overdue{color:var(--red)!important}
+    .due-soon{color:var(--yellow)!important}
+    .divider{height:1px;background:var(--border);margin:14px 0}
+    .empty-state{text-align:center;padding:48px 24px;color:var(--muted)}
+    .empty-state .emoji{font-size:36px;margin-bottom:10px}
+    .empty-state p{font-size:13px;line-height:1.6}
+
+    .toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;display:none;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+    .toast.success{background:var(--green);color:#0f1117}
+    .toast.error{background:var(--red);color:#fff}
+    .toast.info{background:var(--accent);color:#fff}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div style="font-size:22px">💳</div>
+    <div>
+      <div class="header-title">Payment Tracker</div>
+      <div class="header-sub">Gremax SG · CIC · CIC EU · CIC UK</div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="sidebar">
+      <div class="nav-section">Menu</div>
+      <div class="nav-item active" onclick="switchPanel('capture',this)"><span class="nav-icon">📧</span> Capture Payment</div>
+      <div class="nav-item" onclick="switchPanel('aplist',this)"><span class="nav-icon">📋</span> AP List</div>
+      <div class="nav-item" onclick="switchPanel('cashflow',this)"><span class="nav-icon">📊</span> Cash Flow</div>
+      <div class="co-section">
+        <div class="co-label">Filter by Entity</div>
+        <button class="co-btn active" data-co="all" onclick="setCoFilter('all',this)"><span class="co-dot dot-all"></span> All Entities</button>
+        <button class="co-btn" data-co="gremax" onclick="setCoFilter('gremax',this)"><span class="co-dot dot-gremax"></span> Gremax SG</button>
+        <button class="co-btn" data-co="cic" onclick="setCoFilter('cic',this)"><span class="co-dot dot-cic"></span> CIC</button>
+        <button class="co-btn" data-co="ciceu" onclick="setCoFilter('ciceu',this)"><span class="co-dot dot-ciceu"></span> CIC EU</button>
+        <button class="co-btn" data-co="cicuk" onclick="setCoFilter('cicuk',this)"><span class="co-dot dot-cicuk"></span> CIC UK</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- CAPTURE -->
+      <div class="panel active" id="panel-capture">
+        <div class="section-header">
+          <div class="section-title">Capture Payment</div>
+        </div>
+        <div class="capture-layout">
+
+          <!-- Left: upload -->
+          <div class="capture-card">
+            <h3>📎 Upload Email or Attachment</h3>
+
+            <div class="drop-zone" id="dropZone">
+              <input type="file" id="fileInput" accept=".msg,.pdf,.xlsx,.xls" onchange="handleFile(this.files[0])"/>
+              <div class="drop-icon">📂</div>
+              <div class="drop-title">Drop file here or click to browse</div>
+              <div class="drop-sub">AI will automatically extract payment details</div>
+              <div class="drop-types">
+                <span class="drop-type">📧 .msg</span>
+                <span class="drop-type">📄 PDF</span>
+                <span class="drop-type">📊 Excel</span>
+              </div>
+            </div>
+
+            <!-- AI status -->
+            <div class="ai-status" id="aiStatus">
+              <div class="ai-spinner"></div>
+              <div class="ai-text"><strong>AI is reading your file…</strong><br><span id="aiStatusText">Extracting payment details</span></div>
+            </div>
+
+            <!-- Preview -->
+            <div class="extracted-preview" id="extractedPreview">
+              <div class="preview-label">✅ Extracted — Review before saving</div>
+              <div id="previewRows"></div>
+            </div>
+
+            <!-- Manual paste fallback -->
+            <div style="margin-top:4px">
+              <div style="font-size:10px;color:var(--muted);margin-bottom:8px;text-align:center">— or paste email subject manually —</div>
+              <div class="field-group">
+                <input class="field-value" id="paste-subject" type="text" placeholder="e.g. BDP-Tredit Thailand port charges-$857.48 -Jul 10"/>
+              </div>
+              <button class="btn btn-ghost" style="width:100%" onclick="extractFromPaste()">🔍 Extract from Subject</button>
+            </div>
+          </div>
+
+          <!-- Right: form -->
+          <div class="capture-card">
+            <h3>📝 Payment Details</h3>
+            <div id="entityBadgeWrap"></div>
+            <div class="field-group">
+              <div class="field-label">Paying Entity</div>
+              <select class="field-value" id="f-entity">
+                <option value="gremax">Gremax SG</option>
+                <option value="cic">CIC</option>
+                <option value="ciceu">CIC EU</option>
+                <option value="cicuk">CIC UK</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Vendor</div>
+              <input class="field-value" id="f-vendor" type="text" placeholder="Vendor name"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">On Behalf Of (Client)</div>
+              <input class="field-value" id="f-client" type="text" placeholder="e.g. Tredit"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Amount</div>
+              <div class="amount-row">
+                <select class="field-value" id="f-currency">
+                  <option>USD</option><option>SGD</option><option>CNY</option>
+                  <option>MYR</option><option>EUR</option><option>GBP</option>
+                </select>
+                <input class="field-value" id="f-amount" type="number" placeholder="0.00"/>
+              </div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Due Date</div>
+              <input class="field-value" id="f-duedate" type="date"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Description</div>
+              <input class="field-value" id="f-desc" type="text" placeholder="e.g. Thailand port misc charges"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Invoice / Reference No.</div>
+              <input class="field-value" id="f-invoice" type="text" placeholder="INV-XXXX"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Approval Status</div>
+              <div class="flow-steps">
+                <div class="flow-step current" id="flow-pending"><span class="si">📥</span>Pending</div>
+                <div class="flow-step" id="flow-approved"><span class="si">✅</span>Approved</div>
+                <div class="flow-step" id="flow-paid"><span class="si">💸</span>Paid</div>
+              </div>
+              <div class="status-row">
+                <button class="status-btn active" data-val="pending" onclick="setStatus(this)">⏳ Pending</button>
+                <button class="status-btn" data-val="approved" onclick="setStatus(this)">✅ Approved</button>
+                <button class="status-btn" data-val="paid" onclick="setStatus(this)">💸 Paid</button>
+                <button class="status-btn" data-val="rejected" onclick="setStatus(this)">❌ Rejected</button>
+              </div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Payment Advice / Notes</div>
+              <input class="field-value" id="f-notes" type="text" placeholder="Payment advice ref after payment"/>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Payment Mode</div>
+              <select class="field-value" id="f-paymode">
+                <option value="TT">TT</option>
+                <option value="PayNow">PayNow</option>
+                <option value="GIRO">GIRO</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Approved By</div>
+              <input class="field-value" id="f-approvedby" type="text" placeholder="e.g. Zhang Yu"/>
+            </div>
+            <div class="divider"></div>
+            <button class="btn btn-success" style="width:100%" onclick="saveRecord()">💾 Save Record</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AP LIST -->
+      <div class="panel" id="panel-aplist">
+        <div class="section-header">
+          <div class="section-title">AP List</div>
+          <div class="section-actions">
+            <button class="btn btn-ghost btn-sm" onclick="setApStatus('all')">All</button>
+            <button class="btn btn-ghost btn-sm" onclick="setApStatus('pending')">Pending</button>
+            <button class="btn btn-ghost btn-sm" onclick="setApStatus('approved')">Approved</button>
+            <button class="btn btn-ghost btn-sm" onclick="setApStatus('paid')">Paid</button>
+          </div>
+        </div>
+        <div class="summary-grid" id="apSummary"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Entity</th><th>Vendor</th><th>Client</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Notes</th><th></th>
+            </tr></thead>
+            <tbody id="apTableBody"></tbody>
+          </table>
+          <div id="apEmpty" class="empty-state" style="display:none">
+            <div class="emoji">📭</div>
+            <p>No records yet.<br/>Upload a .msg file or paste a subject to get started.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASH FLOW -->
+      <div class="panel" id="panel-cashflow">
+        <div class="section-header">
+          <div class="section-title">Cash Flow Forecast</div>
+          <div class="section-actions">
+            <button class="btn btn-ghost btn-sm" onclick="setCfFilter('all')">All</button>
+            <button class="btn btn-ghost btn-sm" onclick="setCfFilter('pending')">Pending</button>
+            <button class="btn btn-ghost btn-sm" onclick="setCfFilter('approved')">Approved</button>
+          </div>
+        </div>
+        <div class="summary-grid" id="cfSummary"></div>
+        <div id="cashflowContent"></div>
+        <div id="cfEmpty" class="empty-state" style="display:none">
+          <div class="emoji">📊</div><p>No payment data yet.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let records = JSON.parse(localStorage.getItem('pt_records') || '[]');
+let currentStatus = 'pending';
+let coFilter = 'all';
+let apStatusFilter = 'all';
+let cfStatusFilter = 'all';
+
+const COMPANIES = {
+  gremax:{ label:'Gremax SG', dot:'dot-gremax', cls:'entity-gremax' },
+  cic:   { label:'CIC',       dot:'dot-cic',    cls:'entity-cic'    },
+  ciceu: { label:'CIC EU',    dot:'dot-ciceu',  cls:'entity-ciceu'  },
+  cicuk: { label:'CIC UK',    dot:'dot-cicuk',  cls:'entity-cicuk'  },
+};
+
+// ── Drag & drop ──
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) handleFile(f);
+});
+
+// ── File handler ──
+async function handleFile(file) {
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  showAiStatus(true, `Reading ${file.name}…`);
+
+  try {
+    if (ext === 'msg') {
+      await handleMsg(file);
+    } else if (ext === 'pdf') {
+      await handlePdf(file);
+    } else if (ext === 'xlsx' || ext === 'xls') {
+      await handleExcel(file);
+    } else {
+      showAiStatus(false);
+      showToast('Unsupported file type. Use .msg, .pdf or .xlsx','error');
+    }
+  } catch(e) {
+    showAiStatus(false);
+    showToast('Error reading file: ' + e.message, 'error');
+  }
+}
+
+// ── MSG handler — extract subject + sender + attachments from .msg binary ──
+async function handleMsg(file) {
+  showAiStatus(true, 'Parsing .msg file…');
+  const buf = await file.arrayBuffer();
+
+  // Extract all UTF-16LE strings from compound file
+  const u16 = new Uint16Array(buf);
+  const strings = [];
+  let chunk = '';
+  for (let i = 0; i < u16.length; i++) {
+    const c = u16[i];
+    if ((c >= 0x4e00 && c <= 0x9fff) || (c >= 32 && c < 127)) {
+      chunk += String.fromCharCode(c);
+    } else {
+      if (chunk.length > 3) strings.push(chunk.trim());
+      chunk = '';
+    }
+  }
+  if (chunk.length > 3) strings.push(chunk.trim());
+
+  // Find subject — look for string matching our payment format
+  // Pattern: contains Chinese chars AND $ AND numbers
+  let subject = '';
+  for (const s of strings) {
+    if (/[\u4e00-\u9fff]/.test(s) && /[\$\d]/.test(s) && s.includes('-') && s.length > 10 && s.length < 120) {
+      subject = s; break;
+    }
+  }
+  // Fallback: longest Chinese string
+  if (!subject) {
+    let best = '';
+    for (const s of strings) {
+      if (/[\u4e00-\u9fff]/.test(s) && s.length > best.length && s.length < 100) best = s;
+    }
+    subject = best;
+  }
+  // Last fallback: filename
+  if (!subject) subject = file.name.replace(/\.msg$/i,'').replace(/_/g,' ').trim();
+
+  // Extract sender email
+  let sender = '';
+  for (const s of strings) {
+    if (s.includes('@') && s.includes('.') && !s.includes(' ') && s.length < 60 && !s.includes('__')) {
+      sender = s; break;
+    }
+  }
+
+  // Extract attachment names (look for .xls .xlsx .pdf strings)
+  const attachments = strings.filter(s => /\.(xls|xlsx|pdf)$/i.test(s) && s.length < 80);
+
+  showAiStatus(false);
+
+  if (subject) {
+    document.getElementById('paste-subject').value = subject;
+    const p = parseSubject(subject);
+    const entity = detectEntity(subject);
+    // Use sender domain to help confirm entity if not found in subject
+    const resolvedEntity = entity || detectEntityFromEmail(sender);
+    populateForm({ ...p, entity: resolvedEntity });
+    showPreview({ ...p, entity: resolvedEntity, sender, attachments });
+    showToast('✅ Email parsed — please review and save', 'success');
+  } else {
+    showToast('Could not read subject — please paste it manually', 'error');
+  }
+}
+
+function detectEntityFromEmail(email) {
+  if (!email) return null;
+  const d = email.toLowerCase();
+  if (d.includes('gremax')) return 'gremax';
+  if (d.includes('crownintcorp')) return 'cic'; // crownintcorp = CIC
+  return null;
+}
+
+// Basic MSG text extraction (reads string data from compound file)
+// extractMsgText removed — using rule-based parsing
+
+// ── PDF handler — use filename as hint ──
+async function handlePdf(file) {
+  showAiStatus(true, 'Reading PDF…');
+  setTimeout(() => {
+    showAiStatus(false);
+    const name = file.name.replace(/\.pdf$/i,'').trim();
+    if (name) {
+      document.getElementById('paste-subject').value = name;
+      const p = parseSubject(name);
+      const entity = detectEntity(name);
+      populateForm({ ...p, entity });
+    }
+    showToast('PDF uploaded — please verify details and fill in any missing fields', 'info');
+  }, 500);
+}
+
+// ── Excel handler — scan for largest number as amount ──
+async function handleExcel(file) {
+  showAiStatus(true, 'Reading Excel…');
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, {type:'array'});
+  let maxAmt = 0; let currency = 'USD';
+  wb.SheetNames.forEach(sheetName => {
+    const ws = wb.Sheets[sheetName];
+    const csv = XLSX.utils.sheet_to_csv(ws);
+    // Find currency
+    const curM = csv.match(/\b(USD|SGD|CNY|MYR|EUR|GBP)\b/i);
+    if (curM) currency = curM[1].toUpperCase();
+    // Find largest number (likely total amount)
+    const nums = csv.match(/[\d,]+\.\d{2}/g)||[];
+    nums.forEach(n => { const v=parseFloat(n.replace(/,/g,'')); if(v>maxAmt) maxAmt=v; });
+  });
+  showAiStatus(false);
+  if (maxAmt > 0) {
+    document.getElementById('f-amount').value = maxAmt;
+    document.getElementById('f-currency').value = currency;
+    showToast(`Excel read — largest amount: ${currency} ${maxAmt.toLocaleString('en',{minimumFractionDigits:2})}. Please fill in remaining fields.`, 'success');
+  } else {
+    showToast('Excel uploaded — could not auto-detect amount. Please fill in manually.', 'info');
+  }
+}
+
+// ── Call Claude API ──
+async function callAI(text, type, base64Pdf) {
+  const systemPrompt = `You are a payment extraction assistant for a Singapore trading company with entities: Gremax SG, CIC, CIC EU, CIC UK.
+
+Extract payment information and respond ONLY with valid JSON, no markdown, no explanation:
+{
+  "entity": "gremax|cic|ciceu|cicuk",
+  "vendor": "vendor company name",
+  "client": "client name if payment is on behalf of someone (e.g. Tredit), else empty string",
+  "amount": 857.48,
+  "currency": "USD|SGD|CNY|MYR|EUR|GBP",
+  "dueDate": "YYYY-MM-DD",
+  "description": "brief description of what the payment is for",
+  "invoice": "invoice number if found, else empty string"
+}
+
+Rules:
+- entity detection: "Tredit" in text → gremax. "CIC EU" → ciceu. "CIC UK" → cicuk. "CIC" alone → cic. "Gremax" → gremax.
+- For dates like "7.10日前" or "before Jul 10" use current year ${new Date().getFullYear()}
+- amount should be a number, not a string
+- If a field cannot be determined, use empty string or 0`;
+
+  const messages = [];
+  if (type === 'pdf' && base64Pdf) {
+    messages.push({ role:'user', content:[
+      { type:'document', source:{ type:'base64', media_type:'application/pdf', data:base64Pdf.split(',')[1] }},
+      { type:'text', text:'Extract payment information from this invoice/document.' }
+    ]});
+  } else {
+    const label = type === 'email' ? 'email content' : type === 'excel' ? 'Excel spreadsheet data' : 'text';
+    messages.push({ role:'user', content:`Extract payment information from this ${label}:\n\n${text}` });
+  }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system: systemPrompt,
+        messages
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.map(c=>c.text||'').join('') || '';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    showAiStatus(false);
+    populateForm(parsed);
+    showPreview(parsed);
+    showToast('✅ AI extracted payment details — please review','success');
+  } catch(e) {
+    showAiStatus(false);
+    showToast('AI extraction failed — please fill in manually','error');
+    console.error(e);
+  }
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// ── Populate form from AI result ──
+function populateForm(p) {
+  if (p.entity) document.getElementById('f-entity').value = p.entity;
+  if (p.vendor) document.getElementById('f-vendor').value = p.vendor;
+  if (p.client) document.getElementById('f-client').value = p.client;
+  if (p.amount) document.getElementById('f-amount').value = p.amount;
+  if (p.currency) document.getElementById('f-currency').value = p.currency;
+  if (p.dueDate) document.getElementById('f-duedate').value = p.dueDate;
+  if (p.description) document.getElementById('f-desc').value = p.description;
+  if (p.invoice) document.getElementById('f-invoice').value = p.invoice;
+  renderEntityBadge(p.entity);
+}
+
+function showPreview(p) {
+  const co = COMPANIES[p.entity];
+  const fields = [
+    ['Entity', co ? co.label : (p.entity||'—')],
+    ['Vendor', p.vendor||'—'],
+    ['Client', p.client||'—'],
+    ['Amount', p.amount ? `${p.currency} ${Number(p.amount).toLocaleString('en',{minimumFractionDigits:2})}` : '—'],
+    ['Due Date', p.dueDate||'—'],
+    ['Description', p.description||'—'],
+  ];
+  if (p.sender) fields.push(['From', p.sender]);
+  if (p.attachments && p.attachments.length) fields.push(['Attachments', p.attachments.join(', ')]);
+  const rows = fields.map(([k,v]) =>
+    `<div class="preview-row"><span class="preview-key">${k}</span><span class="preview-val">${esc(v||'')}</span></div>`
+  ).join('');
+  document.getElementById('previewRows').innerHTML = rows;
+  document.getElementById('extractedPreview').classList.add('active');
+}
+
+// ── Manual paste fallback ──
+function extractFromPaste() {
+  const subject = document.getElementById('paste-subject').value.trim();
+  if (!subject) { showToast('Please enter the email subject','error'); return; }
+  const p = parseSubject(subject);
+  const entity = detectEntity(subject);
+  populateForm({ ...p, entity });
+  showToast('✅ Extracted from subject — please review','success');
+}
+
+function detectEntity(text) {
+  const s = text.toLowerCase();
+  if (s.includes('cic eu')||s.includes('ciceu')) return 'ciceu';
+  if (s.includes('cic uk')||s.includes('cicuk')) return 'cicuk';
+  if (s.includes('cic')) return 'cic';
+  if (s.includes('gremax')||s.includes('tredit')) return 'gremax';
+  return null;
+}
+
+function parseSubject(subject) {
+  // Two formats:
+  // A) "CIC付款申请-雄鹰香港-$18,116.90-6.18付"
+  //    → entity=CIC, vendor=雄鹰香港, amount=18116.90, due=06-18
+  // B) "BDP-Tredit泰国发港杂费付款-$857.48-7.10日前"
+  //    → vendor=BDP, client=Tredit, desc=泰国发港杂费付款, amount=857.48, due=07-10
+
+  const year = new Date().getFullYear();
+  const parts = subject.split('-');
+
+  // ── Detect entity from first segment ──
+  const first = parts[0].trim();
+  const entity = detectEntity(first);
+
+  // Known client names that may appear in subject
+  const KNOWN_CLIENTS = ['Tredit','tredit'];
+
+  let vendor = '';
+  let client = '';
+  let description = '';
+
+  if (entity) {
+    // Format A: first segment IS the entity (e.g. "CIC付款申请")
+    // → vendor = second segment
+    vendor = (parts[1] || '').trim();
+    description = first.replace(/^(CIC EU|CIC UK|CIC|Gremax SG|Gremax)/i,'').replace(/付款申请|付款/g,'').trim();
+  } else {
+    // Format B: first segment is vendor (e.g. "BDP")
+    vendor = first;
+    // Second segment may be "ClientDesc" like "Tredit泰国发港杂费付款"
+    const seg2 = (parts[1] || '').trim();
+    // Check if seg2 starts with a known client name
+    let foundClient = null;
+    for (const kc of KNOWN_CLIENTS) {
+      if (seg2.toLowerCase().startsWith(kc.toLowerCase())) {
+        foundClient = kc;
+        break;
+      }
+    }
+    if (foundClient) {
+      client = foundClient;
+      description = seg2.slice(foundClient.length).trim();
+    } else {
+      // No known client — treat whole seg2 as description
+      description = seg2;
+    }
+  }
+
+  // ── Amount ──
+  const amtM = subject.match(/(?:USD|SGD|CNY|MYR|EUR|GBP|S\$|\$)\s*([\d,]+(?:\.\d{1,2})?)/i)
+             || subject.match(/([\d,]+(?:\.\d{1,2})?)\s*(?:USD|SGD|CNY|MYR|EUR|GBP)/i);
+  const amount = amtM ? parseFloat(amtM[1].replace(/,/g,'')) : 0;
+
+  // ── Currency ──
+  let currency = 'USD';
+  const curM = subject.match(/\b(USD|SGD|CNY|MYR|EUR|GBP)\b/i);
+  if (curM) currency = curM[1].toUpperCase();
+  else if (/S\$/.test(subject)) currency = 'SGD';
+  else if (/\$/.test(subject)) currency = 'USD';
+  else if (/RM/.test(subject)) currency = 'MYR';
+
+  // ── Due date: "6.18付" "7.10日前" "6.18前" ──
+  let dueDate = '';
+  const mdPay = subject.match(/(\d{1,2})\.(\d{1,2})(?:付|前|日前)/);
+  if (mdPay) dueDate = `${year}-${mdPay[1].padStart(2,'0')}-${mdPay[2].padStart(2,'0')}`;
+  if (!dueDate) {
+    const isoM = subject.match(/(\d{4}-\d{2}-\d{2})/);
+    if (isoM) dueDate = isoM[1];
+  }
+  if (!dueDate) {
+    const mths = {jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
+    const mM = subject.match(/(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)
+             || subject.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})/i);
+    if (mM) {
+      const day = (mM[1].match(/\d/)? mM[1]:mM[2]).padStart(2,'0');
+      const mo  = mths[(mM[1].match(/[a-z]/i)?mM[1]:mM[2]).toLowerCase().slice(0,3)];
+      dueDate = `${year}-${mo}-${day}`;
+    }
+  }
+
+  return { vendor, amount, currency, dueDate, client, description, invoice:'', entity };
+}
+
+// ── UI helpers ──
+function showAiStatus(show, msg='') {
+  const el = document.getElementById('aiStatus');
+  el.classList.toggle('active', show);
+  if (msg) document.getElementById('aiStatusText').textContent = msg;
+}
+
+function renderEntityBadge(entity) {
+  const wrap = document.getElementById('entityBadgeWrap');
+  if (!entity || !COMPANIES[entity]) { wrap.innerHTML=''; return; }
+  const co = COMPANIES[entity];
+  wrap.innerHTML = `<div class="entity-badge ${co.cls}"><span class="co-dot ${co.dot}"></span> ${co.label} — Auto-detected</div>`;
+}
+
+function setStatus(btn) {
+  document.querySelectorAll('.status-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentStatus = btn.dataset.val;
+  const steps=['pending','approved','paid'];
+  const idx=steps.indexOf(currentStatus);
+  steps.forEach((s,i)=>{
+    const el=document.getElementById('flow-'+s); if(!el) return;
+    el.className='flow-step';
+    if(i<idx) el.classList.add('done');
+    else if(i===idx) el.classList.add('current');
+  });
+}
+
+function saveRecord() {
+  const vendor=document.getElementById('f-vendor').value.trim();
+  const amount=parseFloat(document.getElementById('f-amount').value);
+  const dueDate=document.getElementById('f-duedate').value;
+  if (!vendor||!amount||!dueDate){ showToast('Please fill in Vendor, Amount and Due Date','error'); return; }
+  const rec = {
+    id:Date.now(),
+    entity:document.getElementById('f-entity').value,
+    vendor, amount,
+    currency:document.getElementById('f-currency').value,
+    dueDate,
+    client:document.getElementById('f-client').value.trim(),
+    desc:document.getElementById('f-desc').value.trim(),
+    invoice:document.getElementById('f-invoice').value.trim(),
+    status:currentStatus,
+    notes:document.getElementById('f-notes').value.trim(),
+    paymode:document.getElementById('f-paymode').value,
+    approvedby:document.getElementById('f-approvedby').value.trim(),
+    capturedAt:new Date().toISOString(),
+  };
+  records.unshift(rec);
+  save();
+  showExcelRow(rec);
+  showToast('✅ Record saved! Copy the row below into Excel.','success');
+  ['f-vendor','f-client','f-amount','f-duedate','f-desc','f-invoice','f-notes','f-approvedby','paste-subject'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  document.getElementById('entityBadgeWrap').innerHTML='';
+  document.getElementById('extractedPreview').classList.remove('active');
+  document.getElementById('fileInput').value='';
+  currentStatus='pending';
+  document.querySelectorAll('.status-btn').forEach(b=>b.classList.toggle('active',b.dataset.val==='pending'));
+  ['pending','approved','paid'].forEach((s,i)=>{const el=document.getElementById('flow-'+s);if(el){el.className='flow-step';el.classList.toggle('current',i===0);}});
+}
+
+function save(){ localStorage.setItem('pt_records',JSON.stringify(records)); }
+
+// ── Excel row export ──
+function showExcelRow(rec) {
+  // Generate AP number based on count for this entity+currency
+  const entityRecs = records.filter(r => r.entity === rec.entity && r.currency === rec.currency);
+  const apNum = String(entityRecs.length).padStart(2,'0');
+
+  // Booking description formula (matches their Excel pattern)
+  const bookingDesc = `AP${apNum}_${COMPANIES[rec.entity]?.label||rec.entity}_SCB${rec.currency}_${rec.vendor}${rec.invoice ? '- Inv No. '+rec.invoice : ''}_${rec.desc}`;
+
+  const invoiceDate = rec.capturedAt.slice(0,10);
+  const cols = [
+    apNum,
+    invoiceDate,
+    rec.invoice || '',
+    rec.vendor + (rec.client ? ' ('+rec.client+')' : ''),
+    Number(rec.amount).toFixed(2),
+    rec.desc,
+    rec.dueDate,
+    bookingDesc,
+    rec.paymode,
+    rec.approvedby,
+  ];
+  const tsv = cols.join('\t'); // tab-separated for Excel paste
+
+  // Show copy UI
+  let box = document.getElementById('excelRowBox');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'excelRowBox';
+    box.style.cssText = 'background:var(--surface);border:1px solid var(--green);border-radius:10px;padding:16px;margin-top:16px;';
+    document.querySelector('.capture-layout').insertAdjacentElement('afterend', box);
+  }
+  box.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px">📋 Excel Row — Copy & Paste into AP List</div>
+      <button class="btn btn-ghost btn-sm" onclick="copyExcelRow('${tsv.replace(/'/g,"\'")}')">⎘ Copy Row</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="font-size:11px;width:100%;border-collapse:collapse">
+        <thead>
+          <tr>${['AP N°','Inv Date','Invoice No','Supplier','Amount','Description','Due Date','Booking Desc','Mode','Approved By'].map(h=>`<th style="padding:4px 8px;color:var(--muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap">${h}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          <tr style="background:var(--surface2)">${cols.map(v=>`<td style="padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis">${esc(String(v))}</td>`).join('')}</tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:10.5px;color:var(--muted);margin-top:8px">💡 Paste into sheet: <strong style="color:var(--text)">${getSheetName(rec)}</strong></div>
+  `;
+}
+
+function getSheetName(rec) {
+  const entity = COMPANIES[rec.entity]?.label || rec.entity;
+  const prefix = entity === 'Gremax SG' ? 'GM' : entity.replace(/\s/g,'');
+  return `${prefix}-${rec.currency}`;
+}
+
+function copyExcelRow(tsv) {
+  navigator.clipboard.writeText(tsv).then(() => {
+    showToast('✅ Copied! Open Excel → click the next empty row → Ctrl+V', 'success');
+  }).catch(() => {
+    // Fallback: select the table row text
+    showToast('Select the row manually and copy', 'info');
+  });
+}
+
+// ── Nav ──
+function switchPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(name==='aplist') renderAP();
+  if(name==='cashflow') renderCF();
+}
+
+function setCoFilter(co, btn) {
+  coFilter=co;
+  document.querySelectorAll('.co-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAP(); renderCF();
+}
+
+function setApStatus(s){ apStatusFilter=s; renderAP(); }
+function setCfFilter(s){ cfStatusFilter=s; renderCF(); }
+
+// ── AP List ──
+function renderAP() {
+  const allE=records.filter(r=>coFilter==='all'||r.entity===coFilter);
+  const list=allE.filter(r=>apStatusFilter==='all'||r.status===apStatusFilter);
+  const tbody=document.getElementById('apTableBody');
+  const empty=document.getElementById('apEmpty');
+  const pendAmt=allE.filter(r=>r.status==='pending').reduce((s,r)=>s+r.amount,0);
+  const appAmt=allE.filter(r=>r.status==='approved').reduce((s,r)=>s+r.amount,0);
+  const paidAmt=allE.filter(r=>r.status==='paid').reduce((s,r)=>s+r.amount,0);
+  document.getElementById('apSummary').innerHTML=`
+    <div class="card"><div class="card-label">Pending Approval</div><div class="card-val" style="color:var(--yellow)">${allE.filter(r=>r.status==='pending').length}</div><div class="card-sub">${fmt(pendAmt)}</div></div>
+    <div class="card"><div class="card-label">Approved — Unpaid</div><div class="card-val" style="color:var(--green)">${allE.filter(r=>r.status==='approved').length}</div><div class="card-sub">${fmt(appAmt)}</div></div>
+    <div class="card"><div class="card-label">Paid</div><div class="card-val" style="color:var(--purple)">${allE.filter(r=>r.status==='paid').length}</div><div class="card-sub">${fmt(paidAmt)}</div></div>`;
+  if(!list.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const bL={pending:'⏳ Pending',approved:'✅ Approved',paid:'💸 Paid',rejected:'❌ Rejected'};
+  const bC={pending:'badge-pending',approved:'badge-approved',paid:'badge-paid',rejected:'badge-rejected'};
+  tbody.innerHTML=list.map(r=>{
+    const co=COMPANIES[r.entity]||COMPANIES.gremax;
+    const due=new Date(r.dueDate); const diff=Math.ceil((due-today)/86400000);
+    const dCls=diff<0?'overdue':diff<=7?'due-soon':'';
+    const dLabel=diff<0?`${Math.abs(diff)}d overdue`:diff===0?'Today':`${diff}d`;
+    return `<tr>
+      <td><span class="co-dot ${co.dot}" style="margin-right:5px"></span>${co.label}</td>
+      <td><div style="font-weight:600">${esc(r.vendor)}</div><div style="color:var(--muted);font-size:10.5px">${esc(r.desc||'')}</div></td>
+      <td>${esc(r.client||'—')}</td>
+      <td style="font-weight:700;color:var(--accent);white-space:nowrap">${r.currency} ${Number(r.amount).toLocaleString('en',{minimumFractionDigits:2})}</td>
+      <td class="${dCls}" style="white-space:nowrap">${r.dueDate}<br><span style="font-size:10px">${dLabel}</span></td>
+      <td><span class="badge ${bC[r.status]}">${bL[r.status]}</span></td>
+      <td style="color:var(--muted);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes||'')}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="cycleStatus(${r.id})">Status ↻</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="del(${r.id})">Del</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function cycleStatus(id){
+  const r=records.find(x=>x.id===id); if(!r) return;
+  const c=['pending','approved','paid','rejected'];
+  r.status=c[(c.indexOf(r.status)+1)%c.length];
+  save(); renderAP();
+}
+function del(id){
+  if(!confirm('Delete this record?')) return;
+  records=records.filter(r=>r.id!==id); save(); renderAP(); renderCF();
+}
+
+// ── Cash Flow ──
+function renderCF() {
+  const content=document.getElementById('cashflowContent');
+  const empty=document.getElementById('cfEmpty');
+  const active=records.filter(r=>r.status!=='rejected'&&(coFilter==='all'||r.entity===coFilter)&&(cfStatusFilter==='all'||r.status===cfStatusFilter));
+  if(!active.length){ content.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const grandTotal=active.reduce((s,r)=>s+r.amount,0);
+  const months=[...new Set(active.map(r=>r.dueDate.slice(0,7)))].length;
+  const overdueAmt=active.filter(r=>new Date(r.dueDate)<today).reduce((s,r)=>s+r.amount,0);
+  const thisMonthAmt=active.filter(r=>r.dueDate.slice(0,7)===new Date().toISOString().slice(0,7)).reduce((s,r)=>s+r.amount,0);
+  document.getElementById('cfSummary').innerHTML=`
+    <div class="card"><div class="card-label">Total Payable</div><div class="card-val">${fmt(grandTotal)}</div><div class="card-sub">${active.length} payments · ${months} month${months!==1?'s':''}</div></div>
+    <div class="card"><div class="card-label">Overdue</div><div class="card-val" style="color:var(--red)">${active.filter(r=>new Date(r.dueDate)<today).length}</div><div class="card-sub">${fmt(overdueAmt)}</div></div>
+    <div class="card"><div class="card-label">Due This Month</div><div class="card-val" style="color:var(--yellow)">${active.filter(r=>r.dueDate.slice(0,7)===new Date().toISOString().slice(0,7)).length}</div><div class="card-sub">${fmt(thisMonthAmt)}</div></div>`;
+  const entities=coFilter==='all'?['gremax','cic','ciceu','cicuk']:[coFilter];
+  let html='';
+  entities.forEach(ent=>{
+    const er=active.filter(r=>r.entity===ent); if(!er.length) return;
+    const co=COMPANIES[ent];
+    const eTotal=er.reduce((s,r)=>s+r.amount,0);
+    const byMonth={};
+    er.forEach(r=>{ const k=r.dueDate.slice(0,7); if(!byMonth[k]) byMonth[k]=[]; byMonth[k].push(r); });
+    html+=`<div class="cf-entity-block">
+      <div class="cf-entity-header"><span class="co-dot ${co.dot}"></span><span class="cf-entity-name">${co.label}</span><span class="cf-entity-total">${fmt(eTotal)}</span></div>`;
+    Object.keys(byMonth).sort().forEach(month=>{
+      const items=byMonth[month].sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+      const mTotal=items.reduce((s,r)=>s+r.amount,0);
+      const mLabel=new Date(month+'-01').toLocaleDateString('en-GB',{year:'numeric',month:'long'});
+      html+=`<div class="cf-month"><div class="cf-month-label">${mLabel}</div>`;
+      items.forEach(r=>{
+        const due=new Date(r.dueDate); const diff=Math.ceil((due-today)/86400000);
+        const dCls=diff<0?'overdue':diff<=7?'due-soon':'';
+        const sIcon={pending:'⏳',approved:'✅',paid:'💸'}[r.status]||'';
+        const dTag=diff<0?`<span class="overdue"> · ${Math.abs(diff)}d overdue</span>`:diff<=7&&diff>=0?`<span class="due-soon"> · Due soon</span>`:'';
+        html+=`<div class="cf-row">
+          <div><div class="cf-vendor">${esc(r.vendor)}${r.client?` · <span style="color:var(--muted);font-weight:400">${esc(r.client)}</span>`:''}</div>
+          <div class="cf-meta ${dCls}">${r.dueDate} ${sIcon}${r.desc?' · '+esc(r.desc):''}${dTag}</div></div>
+          <div class="cf-amount">${r.currency} ${Number(r.amount).toLocaleString('en',{minimumFractionDigits:2})}</div>
+        </div>`;
+      });
+      html+=`<div class="cf-month-total"><span class="cf-month-total-label">Monthly total</span><span class="cf-month-total-val">${fmt(mTotal)}</span></div></div>`;
+    });
+    html+=`</div>`;
+  });
+  content.innerHTML=html;
+}
+
+// ── Export ──
+function exportCSV(){
+  const h=['Entity','Vendor','Client','Amount','Currency','Due Date','Description','Invoice','Status','Notes','Captured At'];
+  const filtered=records.filter(r=>coFilter==='all'||r.entity===coFilter);
+  const rows=filtered.map(r=>[COMPANIES[r.entity]?.label||r.entity,r.vendor,r.client,r.amount,r.currency,r.dueDate,r.desc,r.invoice,r.status,r.notes,r.capturedAt].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`));
+  const csv=[h.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='ap_list_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+}
+
+function fmt(n){ return n.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type; t.style.display='block';
+  setTimeout(()=>t.style.display='none',3500);
+}
+
+renderAP(); renderCF();
+</script>
+</body>
+</html>
